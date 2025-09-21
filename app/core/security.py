@@ -8,10 +8,12 @@ from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+ALGORITHM = "HS256"
+
 def create_access_token(subject: Optional[str], expires_delta: timedelta) -> str:
     expires = datetime.now() + expires_delta
     to_encode = {"exp": expires, "sub": subject} 
-    encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 def get_password_hash(password: str) -> str:
