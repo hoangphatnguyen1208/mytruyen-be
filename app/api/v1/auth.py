@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
 from datetime import timedelta
@@ -11,6 +11,8 @@ from app.schema.auth import Token
 
 from app.api.deps import SessionDep
 
+from app.utilities.exceptions.http.exc_400 import http_exc_400_credentials_bad_signin_request
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -18,7 +20,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 def login_access_token(session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = user.authenticate(session, form_data.username, form_data.password)
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        raise http_exc_400_credentials_bad_signin_request()
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return Token(
         access_token=create_access_token(

@@ -4,7 +4,7 @@ The HTTP 403 Forbidden response status code indicates that the server understand
 
 import fastapi
 
-from src.utilities.messages.exceptions.http.exc_details import http_403_forbidden_details
+from app.utilities.messages.exceptions.http.exc_details import http_403_forbidden_details
 
 
 async def http_403_exc_forbidden_request() -> Exception:

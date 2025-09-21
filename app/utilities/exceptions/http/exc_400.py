@@ -6,7 +6,7 @@ cannot or will not process the request due to something that is perceivedto be a
 
 import fastapi
 
-from src.utilities.messages.exceptions.http.exc_details import (
+from app.utilities.messages.exceptions.http.exc_details import (
     http_400_email_details,
     http_400_sigin_credentials_details,
     http_400_signup_credentials_details,

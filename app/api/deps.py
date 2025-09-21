@@ -4,6 +4,8 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.utilities.exceptions.http.exc_403 import http_403_exc_forbidden_request
+from app.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_request
 
 from app.core.config import settings
 from app.core.db import async_engine
@@ -23,16 +25,10 @@ TokenDep = Annotated[str, Depends(reusable_oauth2)]
 def get_current_user(session: SessionDep, token: TokenDep):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[security.ALGORITHM])
-        token_data = payload.get("sub")
+        id = payload.get("sub")
     except jwt.PyJWTError:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
-        )
-    user = crud_user.get_user_by_id(session, token_data)
+        raise http_403_exc_forbidden_request()
+    user = crud_user.get_user_by_id(session, id)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
+        raise http_404_exc_id_not_found_request(id=id)
     return user
