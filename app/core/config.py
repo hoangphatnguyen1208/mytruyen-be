@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     POSTGRE_USER: str
     POSTGRE_PASSWORD: str
     POSTGRE_URL: str
+    POSTGRE_SYNC_URL: str
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int 
     JWT_SECRET_KEY: str 
