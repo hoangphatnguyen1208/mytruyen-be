@@ -11,6 +11,7 @@ from app.utilities.messages.exceptions.http.exc_details import (
     http_400_sigin_credentials_details,
     http_400_signup_credentials_details,
     http_400_username_details,
+    http_400_book_slug_details,
 )
 
 
@@ -39,4 +40,10 @@ async def http_400_exc_bad_email_request(email: str) -> Exception:
     return fastapi.HTTPException(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
         detail=http_400_email_details(email=email),
+    )
+
+async def http_400_exc_bad_book_slug_request(slug: str) -> Exception:
+    return fastapi.HTTPException(
+        status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+        detail=http_400_book_slug_details(slug=slug),
     )

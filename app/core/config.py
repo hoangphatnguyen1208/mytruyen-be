@@ -21,4 +21,7 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str 
     JWT_ALGORITHM: str
 
+    FIRST_ADMIN_EMAIL: str
+    FIRST_ADMIN_PASSWORD: str
+
 settings = Settings()

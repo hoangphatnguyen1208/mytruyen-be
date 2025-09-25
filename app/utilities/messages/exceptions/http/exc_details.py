@@ -13,6 +13,9 @@ def http_400_signup_credentials_details() -> str:
 def http_400_sigin_credentials_details() -> str:
     return "Signin failed! Recheck all your credentials!"
 
+def http_400_book_slug_details(slug: str) -> str:
+    return f"The book slug '{slug}' is already in use! Please choose a different slug!"
+
 
 def http_401_unauthorized_details() -> str:
     return "Refused to complete request due to lack of valid authentication!"
