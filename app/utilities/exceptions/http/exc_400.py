@@ -5,6 +5,8 @@ cannot or will not process the request due to something that is perceivedto be a
 """
 
 import fastapi
+from fastapi.responses import JSONResponse
+from app.schema.response import Response
 
 from app.utilities.messages.exceptions.http.exc_details import (
     http_400_email_details,
@@ -15,35 +17,56 @@ from app.utilities.messages.exceptions.http.exc_details import (
 )
 
 
-def http_exc_400_credentials_bad_signup_request() -> Exception:
-    return fastapi.HTTPException(
+def http_exc_400_credentials_bad_signup_request() -> JSONResponse:
+    return JSONResponse(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-        detail=http_400_signup_credentials_details(),
+        content=Response(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            message=http_400_signup_credentials_details(),
+            success=False,
+        ).model_dump()
     )
 
 
-def http_exc_400_credentials_bad_signin_request() -> Exception:
-    return fastapi.HTTPException(
+def http_exc_400_credentials_bad_signin_request() -> JSONResponse:
+    return JSONResponse(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-        detail=http_400_sigin_credentials_details(),
+        content=Response(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            message=http_400_sigin_credentials_details(),
+            success=False,
+        ).model_dump()
     )
 
 
-def http_400_exc_bad_username_request(username: str) -> Exception:
-    return fastapi.HTTPException(
+def http_400_exc_bad_username_request(username: str) -> JSONResponse:
+    return JSONResponse(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-        detail=http_400_username_details(username=username),
+        content=Response(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            message=http_400_username_details(username=username),
+            success=False,
+        ).model_dump()
     )
 
 
-def http_400_exc_bad_email_request(email: str) -> Exception:
-    return fastapi.HTTPException(
+def http_400_exc_bad_email_request(email: str) -> JSONResponse:
+    return JSONResponse(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-        detail=http_400_email_details(email=email),
+        content=Response(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            message=http_400_email_details(email=email),
+            success=False,
+        ).model_dump()
     )
 
-def http_400_exc_bad_book_request(slug: str) -> Exception:
-    return fastapi.HTTPException(
+
+def http_400_exc_bad_book_request(slug: str) -> JSONResponse:
+    return JSONResponse(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-        detail=http_400_book_details(string=slug),
+        content=Response(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            message=http_400_book_details(string=slug),
+            success=False,
+        ).model_dump()
     )

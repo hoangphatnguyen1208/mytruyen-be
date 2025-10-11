@@ -28,17 +28,17 @@ async def get_current_user(session: SessionDep, token: TokenDep):
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         id = payload.get("sub")
     except jwt.PyJWTError:
-        raise http_403_exc_forbidden_request()
+        return http_403_exc_forbidden_request()
     user = await crud_user.get_user_by_id(session, id)
     if not user:
-        raise http_404_exc_id_not_found_request(id=id)
+        return http_404_exc_id_not_found_request(id=id)
     return user
 
 CurrentUser: TypeAlias = Annotated[User, Depends(get_current_user)]
 
 def get_current_admin(current_user: CurrentUser) -> User:
     if current_user.role != UserRole.ADMIN:
-        raise http_403_exc_forbidden_request()
+        return http_403_exc_forbidden_request()
     return current_user
 
 CurrentAdmin: TypeAlias = Annotated[User, Depends(get_current_admin)]
