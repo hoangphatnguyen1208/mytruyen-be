@@ -5,12 +5,13 @@ from app.models import user_role as UserRole
 import uuid
 
 class UserBase(SQLModel):
-    email: EmailStr
+    id: uuid.UUID
+    email: str
     full_name: str | None = None
     is_active: bool = True
 
 class UserRegister(SQLModel):
-    email: EmailStr
+    email: str
     password: str
 
 class UserCreate(SQLModel):
@@ -19,4 +20,4 @@ class UserCreate(SQLModel):
     role: UserRole = UserRole.USER
 
 class UserPublic(UserBase):
-    id: uuid.UUID
+    pass

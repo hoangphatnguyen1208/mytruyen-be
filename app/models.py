@@ -31,11 +31,18 @@ class User(SQLModel, table=True):
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
     updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
 
+    books: list["Book"] = Relationship(back_populates="author")
+
 class book_status(str, Enum):
     __enum_name__ = "book_status"
     ONGOING = "Còn tiếp"
     COMPLETED = "Hoàn thành"
     PAUSED = "Tạm dừng"
+
+class GenreBook(SQLModel, table=True):
+    __tablename__ = "genre_book"
+    genre_id: uuid.UUID = Field(foreign_key="genre.id", nullable=False, primary_key=True)
+    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, primary_key=True)
 
 class Book(SQLModel, table=True):
     __tablename__ = "book"
@@ -56,9 +63,27 @@ class Book(SQLModel, table=True):
     comment_count: int = Field(default=0, nullable=False)
     review_count: int = Field(default=0, nullable=False)
     average_rating: float = Field(default=0.0, nullable=False)
+    bookmark_count: int = Field(default=0, nullable=False)
+    poster: str = Field(nullable=False)
+    note: str = Field(nullable=False)
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
     updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
     published_at: datetime | None = Field(default=None)
+
+    genres: list["Genre"] = Relationship(back_populates="books", link_model=GenreBook)
+    author: User = Relationship(back_populates="books")
+
+class Genre(SQLModel, table=True):
+    __tablename__ = "genre"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(index=True, unique=True, nullable=False)
+    slug: str = Field(index=True, unique=True, nullable=False)
+    description: str | None = Field(default=None)
+    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
+    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+
+    books: list[Book] = Relationship(back_populates="genres", link_model=GenreBook)
+
 
 class Chapter(SQLModel, table=True):
     __tablename__ = "chapter"
@@ -87,7 +112,7 @@ class Comment(SQLModel, table=True):
     __tablename__ = "comment"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
-    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False)
+    chapter_id: uuid.UUID = Field(foreign_key="chapter.id", nullable=False)
     parent_id: uuid.UUID | None = Field(default=None, foreign_key="comment.id")
     content: str = Field(nullable=False)
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})

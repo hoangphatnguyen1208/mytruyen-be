@@ -13,8 +13,8 @@ def http_400_signup_credentials_details() -> str:
 def http_400_sigin_credentials_details() -> str:
     return "Signin failed! Recheck all your credentials!"
 
-def http_400_book_slug_details(slug: str) -> str:
-    return f"The book slug '{slug}' is already in use! Please choose a different slug!"
+def http_400_book_details(string: str) -> str:
+    return f"The book with `{string}` already exists!"
 
 
 def http_401_unauthorized_details() -> str:
@@ -35,3 +35,7 @@ def http_404_username_details(username: str) -> str:
 
 def http_404_email_details(email: str) -> str:
     return f"Either the account with email `{email}` doesn't exist, has been deleted, or you are not authorized!"
+
+
+def http_404_book_details(string: str) -> str:
+    return f"The book with `{string}` doesn't exist"
