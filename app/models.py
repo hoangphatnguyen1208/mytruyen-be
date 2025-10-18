@@ -1,8 +1,10 @@
 from sqlmodel import SQLModel, Field, Relationship
 import uuid
-from sqlalchemy import func, MetaData
+from sqlalchemy import Column, func, MetaData
 from datetime import datetime
 from enum import Enum
+from sqlalchemy.dialects.postgresql import JSONB
+
 
 naming_convention = {
     "ix": "ix_%(column_0_label)s",
@@ -19,6 +21,7 @@ class user_role(str, Enum):
     __enum_name__ = "user_role"
     USER = "user"
     ADMIN = "admin"
+
 
 class User(SQLModel, table=True):
     __tablename__ = "user"
@@ -64,14 +67,14 @@ class Book(SQLModel, table=True):
     review_count: int = Field(default=0, nullable=False)
     average_rating: float = Field(default=0.0, nullable=False)
     bookmark_count: int = Field(default=0, nullable=False)
-    poster: str = Field(nullable=False)
+    poster: dict = Field(sa_column=Column(JSONB))
     note: str = Field(nullable=False)
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
     updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
     published_at: datetime | None = Field(default=None)
 
-    genres: list["Genre"] = Relationship(back_populates="books", link_model=GenreBook)
-    author: User = Relationship(back_populates="books")
+    genres: list["Genre"] = Relationship(back_populates="books", link_model=GenreBook, sa_relationship_kwargs={"lazy": "selectin"})
+    author: User = Relationship(back_populates="books", sa_relationship_kwargs={"lazy": "selectin"})
 
 class Genre(SQLModel, table=True):
     __tablename__ = "genre"
@@ -100,6 +103,9 @@ class Chapter(SQLModel, table=True):
     updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
     published_at: datetime | None = Field(default=None)
 
+    chapter_content: "ChapterContent" = Relationship(back_populates="chapter")
+    comments: list["Comment"] = Relationship(back_populates="chapter")
+
 class ChapterContent(SQLModel, table=True):
     __tablename__ = "chapter_content"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
@@ -107,6 +113,8 @@ class ChapterContent(SQLModel, table=True):
     content: str = Field(nullable=False)
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
     updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    
+    chapter: "Chapter" = Relationship(back_populates="chapter_content")
 
 class Comment(SQLModel, table=True):
     __tablename__ = "comment"
@@ -117,6 +125,8 @@ class Comment(SQLModel, table=True):
     content: str = Field(nullable=False)
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
     updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    
+    chapter: "Chapter" = Relationship(back_populates="comments")
 
 class Review(SQLModel, table=True):
     __tablename__ = "review"

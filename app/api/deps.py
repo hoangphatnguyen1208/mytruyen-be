@@ -3,6 +3,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated, TypeAlias
 from sqlmodel.ext.asyncio.session import AsyncSession
+import uuid
 
 from app.utilities.exceptions.http.exc_403 import http_403_exc_forbidden_request
 from app.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_request
@@ -28,17 +29,23 @@ async def get_current_user(session: SessionDep, token: TokenDep):
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         id = payload.get("sub")
     except jwt.PyJWTError:
-        return http_403_exc_forbidden_request()
+        raise http_403_exc_forbidden_request()
+    if not id:
+        raise http_403_exc_forbidden_request()
+    id = uuid.UUID(id)
     user = await crud_user.get_user_by_id(session, id)
     if not user:
-        return http_404_exc_id_not_found_request(id=id)
+        raise http_404_exc_id_not_found_request()
     return user
 
 CurrentUser: TypeAlias = Annotated[User, Depends(get_current_user)]
 
 def get_current_admin(current_user: CurrentUser) -> User:
     if current_user.role != UserRole.ADMIN:
-        return http_403_exc_forbidden_request()
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
     return current_user
 
 CurrentAdmin: TypeAlias = Annotated[User, Depends(get_current_admin)]

@@ -21,13 +21,17 @@ class BookBase(SQLModel):
     chapter_per_week: int
     published: bool
     synopsis: str
-    # poster: Poster
+    note: str
+    
 
 class BookRegister(BookBase):
     genre_ids: list[uuid.UUID]
+    poster: Poster
+
 class BookCreate(BookBase):
     author_id: uuid.UUID
     genre_ids: list[uuid.UUID]
+    poster: dict
 
 class BookPublic(BookBase):
     id: uuid.UUID
@@ -38,6 +42,8 @@ class BookPublic(BookBase):
     comment_count: int
     review_count: int
     average_rating: float
+    bookmark_count: int
+    poster: Poster
     created_at: datetime
     updated_at: datetime
     published_at: datetime | None
@@ -45,16 +51,17 @@ class BookPublic(BookBase):
     author: UserPublic
     genres: list[GenrePublic] 
 
-class BookUpdate(BookBase):
-    name: str = None
-    slug: str = None
-    kind: int = None
-    sex: int  = None
-    status: BookStatus = None
-    chapter_per_week: int = None
-    published: bool = None
-    synopsis: str = None
-    genre_ids: list[uuid.UUID] = None
+class BookUpdate(SQLModel):
+    name: str | None = None
+    slug: str | None = None
+    kind: int | None = None
+    sex: int | None = None
+    status: BookStatus | None = None
+    chapter_per_week: int | None = None
+    published: bool | None = None
+    synopsis: str | None = None
+    note: str | None = None
+    genre_ids: list[uuid.UUID] | None = None
 
 
 

@@ -1,7 +1,7 @@
 import jwt
 from passlib.context import CryptContext
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from app.core.config import settings
@@ -9,10 +9,24 @@ from app.core.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_access_token(subject: Optional[str], expires_delta: timedelta) -> str:
-    expires = datetime.now() + expires_delta
+    expires = datetime.now(timezone.utc) + expires_delta
     to_encode = {"exp": expires, "sub": subject} 
     encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
     return encoded_jwt
+
+def decode_token(token: str) -> Optional[str]:
+    """Decode JWT token và trả về subject (user_id)"""
+    try:
+        payload = jwt.decode(
+            token, 
+            settings.JWT_SECRET_KEY, 
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+        return payload.get("sub")
+    except jwt.ExpiredSignatureError:
+        return None
+    except (jwt.PyJWTError, jwt.DecodeError):
+        return None
 
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)

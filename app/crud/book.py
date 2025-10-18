@@ -8,21 +8,27 @@ from app.schema.book import BookCreate, BookUpdate, BookPublic
 async def create_book(session: AsyncSession, book_create: BookCreate) -> Book:
     db_book = Book.model_validate(book_create)
     session.add(db_book)
+    await session.flush()
+    await session.refresh(db_book)
+    if book_create.genre_ids:
+        genres = await session.exec(select(Genre).where(Genre.id.in_(book_create.genre_ids)))
+        db_book.genres = genres.all()
+        session.add(db_book)
     await session.commit()
     await session.refresh(db_book)
     return db_book
 
 async def get_books(session: AsyncSession) -> list[Book]:
-    statement = select(Book).options(selectinload(Book.genres), selectinload(Book.author))
+    statement = select(Book)
     books = await session.exec(statement)
     return books.all()
 
 async def get_book_by_id(session: AsyncSession, book_id: str) -> Book | None:
-    book = await session.exec(select(Book).where(Book.id == book_id).options(selectinload(Book.genres), selectinload(Book.author)))
+    book = await session.exec(select(Book).where(Book.id == book_id))
     return book.first()
 
 async def get_book_by_slug(session: AsyncSession, slug: str) -> Book | None:
-    statement = select(Book).where(Book.slug == slug).options(selectinload(Book.genres), selectinload(Book.author))
+    statement = select(Book).where(Book.slug == slug)
     books = await session.exec(statement)
     return books.first()
 
@@ -41,8 +47,6 @@ async def update_book(session: AsyncSession, book_id: str, book: BookUpdate) -> 
 
 async def delete_book(session: AsyncSession, book_id: str) -> bool:
     book = await get_book_by_id(session, book_id)
-    if not book:
-        return False
     await session.delete(book)
     await session.commit()
     return True

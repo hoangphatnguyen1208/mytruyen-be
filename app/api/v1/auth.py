@@ -26,7 +26,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def login_access_token(session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = await user_crud.authenticate(session, form_data.username, form_data.password)
     if not user:
-        return http_exc_400_credentials_bad_signin_request()
+        raise http_exc_400_credentials_bad_signin_request()
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return Token(
         access_token=create_access_token(
@@ -39,7 +39,7 @@ async def login_access_token(session: SessionDep, form_data: Annotated[OAuth2Pas
 async def login(session: SessionDep, user_login: UserLogin):
     user = await user_crud.authenticate(session, user_login.email, user_login.password)
     if not user:
-        return http_exc_400_credentials_bad_signin_request()
+        raise http_exc_400_credentials_bad_signin_request()
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return Token(
         access_token=create_access_token(
@@ -52,7 +52,7 @@ async def login(session: SessionDep, user_login: UserLogin):
 async def register(session: SessionDep, user_register: UserRegister):
     existing_user = await user_crud.get_user_by_email(session, user_register.email)
     if existing_user:
-        return http_400_exc_bad_email_request(email=user_register.email)
+        raise http_400_exc_bad_email_request(email=user_register.email)
     user = await user_crud.create_user(session, user_register)
     return {"message": "User registered successfully"}
 

@@ -16,6 +16,14 @@ def http_400_sigin_credentials_details() -> str:
 def http_400_book_details(string: str) -> str:
     return f"The book with `{string}` already exists!"
 
+def http_400_genre_details(string: str) -> str:
+    return f"The genre with `{string}` already exists!"
+
+def http_400_chapter_details(string: str) -> str:
+    return f"The chapter with `{string}` already exists!"
+
+def http_400_chapter_content_details(string: str) -> str:
+    return f"The chapter content with `{string}` already exists!"
 
 def http_401_unauthorized_details() -> str:
     return "Refused to complete request due to lack of valid authentication!"
@@ -36,6 +44,14 @@ def http_404_username_details(username: str) -> str:
 def http_404_email_details(email: str) -> str:
     return f"Either the account with email `{email}` doesn't exist, has been deleted, or you are not authorized!"
 
-
 def http_404_book_details(string: str) -> str:
     return f"The book with `{string}` doesn't exist"
+
+def http_404_genre_details(genre_id: str) -> str:
+    return f"The genre with `{genre_id}` doesn't exist"
+
+def http_404_chapter_details(chapter_id: str) -> str:
+    return f"The chapter with `{chapter_id}` doesn't exist"
+
+def http_404_chapter_content_details(chapter_id: str) -> str:
+    return f"The chapter content for chapter with `{chapter_id}` doesn't exist"

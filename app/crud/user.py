@@ -9,7 +9,7 @@ from app.schema.user import UserCreate
 
 from app.core.security import get_password_hash, verify_password
 
-async def authenticate(session: AsyncSession, email: str, password: str) -> User | None:
+async def authenticate(session: AsyncSession, email: str, password: str) -> User:
     users = await session.exec(select(User).where(User.email == email))
     user_db = users.first()
     if not user_db:
@@ -27,10 +27,10 @@ async def create_user(session: AsyncSession, user_create: UserCreate):
     session.refresh(user)
     return user
 
-async def get_user_by_id(session: AsyncSession, user_id: uuid.UUID) -> User | None:
+async def get_user_by_id(session: AsyncSession, user_id: uuid.UUID) -> User:
     user_db =  await session.get(User, user_id)
     return user_db
 
-async def get_user_by_email(session: AsyncSession, email: str) -> User | None:
+async def get_user_by_email(session: AsyncSession, email: str) -> User:
     users = await session.exec(select(User).where(User.email == email))
     return users.first()
