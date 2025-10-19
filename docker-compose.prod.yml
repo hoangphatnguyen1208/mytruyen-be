@@ -23,9 +23,9 @@ services:
         depends_on:
             - mytruyen-db
         environment:
-            DATABASE_HOST: mytruyen-db
-            DATABASE_PORT: 5432
-            DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mytruyen-db:5432/${POSTGRES_DB}
+            DATABASE_HOST: ${POSTGRE_SERVER}
+            DATABASE_PORT: ${POSTGRE_PORT}
+            DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRE_SERVER}:${POSTGRE_PORT}/${POSTGRE_DB}
             PORT: 8000
         ports:
             - "8000:8000"
