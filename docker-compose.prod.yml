@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+    mytruyen-db:
+        image: postgres:15
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        ports:
+            - ${POSTGRES_EXTERNAL_PORT}:5432
+        volumes:
+            - db-data:/var/lib/postgresql/data
+        networks:
+            - mytruyen-net
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+            interval: 10s
+            timeout: 10s
+            retries: 5
+
+    mytruyen-be:
+        image: hoangphat120805/mytruyen-be:latest
+        depends_on:
+            - mytruyen-db
+        environment:
+            DATABASE_HOST: mytruyen-db
+            DATABASE_PORT: 5432
+            DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mytruyen-db:5432/${POSTGRES_DB}
+            PORT: 8000
+        ports:
+            - "8000:8000"
+        networks:
+            - mytruyen-net
+        command: >
+            bash -c "
+            alembic upgrade head &&
+            uvicorn app.main:app --host 0.0.0.0 --port 8000
+            "
+
+volumes:
+    db-data:
+
+networks:
+    mytruyen-net:
+        driver: bridge
