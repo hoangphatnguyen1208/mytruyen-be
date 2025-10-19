@@ -15,5 +15,6 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            cd mytruyen-be
             docker pull hoangphat120805/mytruyen-be:latest
             docker compose up -d --force-recreate
