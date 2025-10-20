@@ -13,7 +13,11 @@ services:
         networks:
             - mytruyen-net
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+                ]
             interval: 10s
             timeout: 10s
             retries: 5
@@ -21,11 +25,12 @@ services:
     mytruyen-be:
         image: hoangphat120805/mytruyen-be:latest
         depends_on:
-            - mytruyen-db
+            mytruyen-db:
+                condition: service_healthy  
         environment:
-            DATABASE_HOST: ${POSTGRE_SERVER}
-            DATABASE_PORT: ${POSTGRE_PORT}
-            DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRE_SERVER}:${POSTGRE_PORT}/${POSTGRE_DB}
+            DATABASE_HOST: ${POSTGRES_SERVER}
+            DATABASE_PORT: ${POSTGRES_PORT}
+            DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_SERVER}:${POSTGRES_PORT}/${POSTGRES_DB}
             PORT: 8000
         ports:
             - "8000:8000"

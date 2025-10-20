@@ -7,7 +7,7 @@ from app.schema.user import UserCreate
 from app.core.config import settings
 
 async_engine = create_async_engine(
-    settings.POSTGRE_URL
+    settings.POSTGRES_URL
 )
 
 async def init_db(session: AsyncSession):

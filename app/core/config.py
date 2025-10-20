@@ -9,13 +9,13 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
 
     API_V1_STR: str
-    POSTGRE_SERVER: str
-    POSTGRE_PORT: int
-    POSTGRE_DB: str
-    POSTGRE_USER: str
-    POSTGRE_PASSWORD: str
-    POSTGRE_URL: str
-    POSTGRE_SYNC_URL: str
+    POSTGRES_SERVER: str
+    POSTGRES_PORT: int
+    POSTGRES_DB: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_URL: str
+    POSTGRES_SYNC_URL: str
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int 
     JWT_SECRET_KEY: str 

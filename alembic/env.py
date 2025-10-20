@@ -42,7 +42,7 @@ def run_migrations_offline() -> None:
 
     """
     context.configure(
-        url=settings.POSTGRE_SYNC_URL,
+        url=settings.POSTGRES_SYNC_URL,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -60,7 +60,7 @@ def run_migrations_online() -> None:
 
     """
     configure = config.get_section(config.config_ini_section)
-    configure["sqlalchemy.url"] = settings.POSTGRE_SYNC_URL
+    configure["sqlalchemy.url"] = settings.POSTGRES_SYNC_URL
     connectable = engine_from_config(
         configure,
         prefix="sqlalchemy.",
