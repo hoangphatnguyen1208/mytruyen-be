@@ -13,8 +13,7 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          debug: True
+          key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd mytruyen-be
             docker pull hoangphat120805/mytruyen-be:latest
