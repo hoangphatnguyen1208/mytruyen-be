@@ -50,9 +50,6 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy project
 COPY . /app
 
-# Ensure entrypoint is executable
-RUN chmod +x /app/docker-entrypoint.sh
-
 # Expose port
 EXPOSE 8000
 
