@@ -24,6 +24,8 @@ services:
 
     mytruyen-be:
         image: hoangphat120805/mytruyen-be:latest
+        env_file:
+            - .env
         depends_on:
             mytruyen-db:
                 condition: service_healthy  
