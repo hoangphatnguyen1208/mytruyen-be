@@ -17,4 +17,5 @@ jobs:
           script: |
             cd mytruyen-be
             docker pull hoangphat120805/mytruyen-be:latest
-            docker compose up -d --force-recreate
+            docker compose up -d mytruyen-be
+            docker system prune -f
