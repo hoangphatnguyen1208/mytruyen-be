@@ -31,14 +31,14 @@ async def read_genre(session: SessionDep, slug: str):
     return genre_db
 
 @router.get("/{genre_id}", response_model=GenrePublic)
-async def read_genre_by_id(session: SessionDep, genre_id: uuid.UUID):
+async def read_genre_by_id(session: SessionDep, genre_id: int):
     genre_db = await genre_crud.get_genre_by_id(session, genre_id)
     if not genre_db:
         raise http_404_exc_genre_not_found(genre_id=genre_id)
     return genre_db
 
 @router.put("/update/{genre_id}", response_model=GenrePublic)
-async def update_genre(session: SessionDep, genre_id: uuid.UUID, genre_in: GenreUpdate, current_admin: CurrentAdmin):
+async def update_genre(session: SessionDep, genre_id: int, genre_in: GenreUpdate, current_admin: CurrentAdmin):
     genre_db = await genre_crud.get_genre_by_id(session, genre_id)
     if not genre_db:
         raise http_404_exc_genre_not_found(genre_id=genre_id)
@@ -46,7 +46,7 @@ async def update_genre(session: SessionDep, genre_id: uuid.UUID, genre_in: Genre
     return genre
 
 @router.delete("/delete/{genre_id}", response_model=dict)
-async def delete_genre(session: SessionDep, genre_id: uuid.UUID, current_admin: CurrentAdmin):
+async def delete_genre(session: SessionDep, genre_id: int, current_admin: CurrentAdmin):
     print(genre_id)
     genre_db = await genre_crud.get_genre_by_id(session, genre_id)
     if not genre_db:

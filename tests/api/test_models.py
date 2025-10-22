@@ -2,7 +2,7 @@
 Test cases cho Models
 """
 import pytest
-from app.models import User, Book, Genre, user_role, book_status
+from app.models import User, Book, Genre, user_role
 from sqlmodel.ext.asyncio.session import AsyncSession
 import uuid
 
@@ -49,7 +49,6 @@ class TestModels:
     async def test_genre_model_creation(self, db_session: AsyncSession):
         """Test tạo Genre model"""
         genre = Genre(
-            id=uuid.uuid4(),
             name="Test Genre",
             slug="test-genre",
             description="Test description"
@@ -74,7 +73,7 @@ class TestModels:
             note="Test note",
             kind=1, 
             sex=0,
-            status=book_status.ONGOING,
+            status_id=1,
             synopsis="Test synopsis"
         )
         db_session.add(book)
@@ -107,13 +106,6 @@ class TestModels:
         
         assert len(test_admin.books) >= 1
         assert any(book.slug == "test-book" for book in test_admin.books)
-
-    @pytest.mark.asyncio
-    async def test_book_status_enum(self):
-        """Test book_status enum"""
-        assert book_status.ONGOING == "Còn tiếp"
-        assert book_status.COMPLETED == "Hoàn thành"
-        assert book_status.PAUSED == "Tạm dừng"
 
     @pytest.mark.asyncio
     async def test_user_role_enum(self):

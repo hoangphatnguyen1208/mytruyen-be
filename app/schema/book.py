@@ -1,6 +1,5 @@
 from sqlmodel import SQLModel
 from pydantic import ConfigDict
-from app.models import book_status as BookStatus
 from app.schema.user import UserPublic
 from app.schema.genre import GenrePublic
 
@@ -17,7 +16,7 @@ class BookBase(SQLModel):
     slug: str
     kind: int
     sex: int
-    status: BookStatus
+    status_id: int
     chapter_per_week: int
     published: bool
     synopsis: str
@@ -25,12 +24,12 @@ class BookBase(SQLModel):
     
 
 class BookRegister(BookBase):
-    genre_ids: list[uuid.UUID]
+    genre_ids: list[int]
     poster: Poster
 
 class BookCreate(BookBase):
     author_id: uuid.UUID
-    genre_ids: list[uuid.UUID]
+    genre_ids: list[int]
     poster: dict
 
 class BookPublic(BookBase):
@@ -56,7 +55,7 @@ class BookUpdate(SQLModel):
     slug: str | None = None
     kind: int | None = None
     sex: int | None = None
-    status: BookStatus | None = None
+    status_id: int | None = None
     chapter_per_week: int | None = None
     published: bool | None = None
     synopsis: str | None = None

@@ -54,7 +54,7 @@ class TestGenre:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["id"] == str(test_genre.id)  # Compare with string UUID
+        assert data["id"] == test_genre.id  # Compare with string UUID
         assert data["name"] == "Fantasy"
 
     @pytest.mark.asyncio
@@ -76,8 +76,7 @@ class TestGenre:
     @pytest.mark.asyncio
     async def test_update_genre_not_found(self, client: AsyncClient, admin_token: str):
         """Test update genre không tồn tại với admin token"""
-        import uuid
-        fake_id = str(uuid.uuid4())
+        fake_id = 1000
         response = await client.put(
             f"{settings.API_V1_STR}/genres/update/{fake_id}",
             json={
@@ -162,8 +161,7 @@ class TestGenre:
     @pytest.mark.asyncio
     async def test_get_genre_by_id_not_found(self, client: AsyncClient):
         """Test lấy genre theo ID không tồn tại"""
-        import uuid
-        fake_id = str(uuid.uuid4())
+        fake_id = 1000
         response = await client.get(
             f"{settings.API_V1_STR}/genres/{fake_id}"
         )
@@ -184,8 +182,7 @@ class TestGenre:
     @pytest.mark.asyncio
     async def test_delete_genre_not_found(self, client: AsyncClient, admin_token: str):
         """Test xóa genre không tồn tại với admin token"""
-        import uuid
-        fake_id = str(uuid.uuid4())
+        fake_id = 1000
         response = await client.delete(
             f"{settings.API_V1_STR}/genres/delete/{fake_id}",
             headers={"Authorization": f"Bearer {admin_token}"}

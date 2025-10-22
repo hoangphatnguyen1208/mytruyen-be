@@ -4,7 +4,6 @@ Test cases cho Book endpoints
 import pytest
 from httpx import AsyncClient
 from app.core.config import settings
-from app.models import book_status
 
 
 class TestBook:
@@ -20,12 +19,12 @@ class TestBook:
                 "slug": "new-book",
                 "kind": 1,
                 "sex": 0,
-                "status": book_status.ONGOING.value,
+                "status_id":1,
                 "chapter_per_week": 3,
                 "published": True,
                 "synopsis": "New book synopsis",
                 "note": "Test note",
-                "genre_ids": [str(test_genre.id)],
+                "genre_ids": [test_genre.id],
                 "poster": {
                     "poster_default": "http://example.com/poster.jpg",
                     "poster_600": "http://example.com/poster_600.jpg",
@@ -52,12 +51,12 @@ class TestBook:
                 "slug": "test-book",
                 "kind": 1,
                 "sex": 0,
-                "status": book_status.ONGOING.value,
+                "status_id": 1,
                 "chapter_per_week": 3,
                 "published": True,
                 "synopsis": "Duplicate book synopsis",
                 "note": "Test note",
-                "genre_ids": [str(test_genre.id)],
+                "genre_ids": [test_genre.id],
                 "poster": {
                     "poster_default": "http://example.com/poster.jpg",
                     "poster_600": "http://example.com/poster_600.jpg",
@@ -80,7 +79,7 @@ class TestBook:
                 "slug": "new-book",
                 "kind": 1,
                 "sex": 0,
-                "status": book_status.ONGOING.value,
+                "status_id": 1,
                 "chapter_per_week": 3,
                 "published": True,
                 "synopsis": "New book synopsis",
@@ -108,7 +107,7 @@ class TestBook:
                 "slug": "user-book",
                 "kind": 1,
                 "sex": 0,
-                "status": book_status.ONGOING,
+                "status_id": 1,
                 "chapter_per_week": 3,
                 "published": True,
                 "synopsis": "User book synopsis",

@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter
 from app.api.deps import SessionDep, CurrentAdmin
 
-from app.crud import book as crud_book, genre as crud_genre
+from app.crud import book as crud_book
 from app.schema.auth import Message
 from app.schema.book import BookCreate, BookPublic, BookUpdate, BookRegister
-from app.schema.response import BookResponse, BooksResponse, Response
 
 from app.utilities.exceptions.http.exc_400 import http_400_exc_bad_book_request
 from app.utilities.exceptions.http.exc_404 import http_404_exc_book_not_found_request

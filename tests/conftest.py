@@ -18,7 +18,7 @@ from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.core.config import settings
 from app.api.deps import get_db
-from app.models import ChapterContent, Chapter, User, Book, Genre, user_role, book_status
+from app.models import ChapterContent, Chapter, User, Book, Genre, user_role
 from app.core.security import get_password_hash
 import uuid
 
@@ -146,7 +146,7 @@ async def test_book(db_session: AsyncSession, test_admin: User) -> Book:
         slug="test-book",
         kind=1,  # Required field
         sex=0,  # Required field (0: Nam, 1: Nữ, 2: Khác)
-        status=book_status.ONGOING,  # Required field
+        status_id=1,  # Required field
         synopsis="Test book description",  # Đổi từ description -> synopsis
         author_id=test_admin.id,
         poster={

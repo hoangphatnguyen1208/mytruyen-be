@@ -19,6 +19,6 @@ class GenreUpdate(SQLModel):
     description: str | None = None
 
 class GenrePublic(GenreBase):
-    id: uuid.UUID
+    id: int
     created_at: datetime
     updated_at: datetime

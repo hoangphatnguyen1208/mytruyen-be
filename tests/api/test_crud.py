@@ -9,7 +9,7 @@ from app.crud import genre as genre_crud
 from app.schema.auth import UserRegister
 from app.schema.book import BookCreate
 from app.schema.genre import GenreCreate
-from app.models import book_status, user_role
+from app.models import user_role
 import uuid
 
 
@@ -75,7 +75,7 @@ class TestBookCRUD:
                     slug="crud-test-book",
                     kind=1, 
                     sex=0, 
-                    status=book_status.ONGOING, 
+                    status_id=1, 
                     synopsis="Test book description",  
                     chapter_per_week=7,  
                     author_id=test_admin.id,
@@ -87,7 +87,7 @@ class TestBookCRUD:
                         "poster_150": "http://example.com/poster_150.jpg"
                     },
                     note="Test note", 
-                    genre_ids=[str(uuid.uuid4())]  
+                    genre_ids=[1] 
         )
         book = await book_crud.create_book(db_session, book_in)
         assert book.name == "CRUD Test Book"
