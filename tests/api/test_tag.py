@@ -33,7 +33,7 @@ async def test_create_tag_requires_admin(client, user_token):
 
 @pytest.mark.asyncio
 async def test_create_tag_as_admin(client, admin_token):
-    payload = {"name": "new-tag-admin", "slug": "new-tag-admin", "description": "desc"}
+    payload = {"name": "new-tag-admin", "slug": "new-tag-admin", "type": "general", "description": "desc"}
     headers = {"Authorization": f"Bearer {admin_token}"}
     response = await client.post(f"{API}/tags", json=payload, headers=headers)
     assert response.status_code == 200
@@ -44,7 +44,7 @@ async def test_create_tag_as_admin(client, admin_token):
 
 @pytest.mark.asyncio
 async def test_create_duplicate_tag_fails(client, admin_token):
-    payload = {"name": "dup-tag", "slug": "dup-tag", "description": "desc"}
+    payload = {"name": "dup-tag", "slug": "dup-tag", "type": "general", "description": "desc"}
     headers = {"Authorization": f"Bearer {admin_token}"}
     # first create
     r1 = await client.post(f"{API}/tags", json=payload, headers=headers)
@@ -56,7 +56,7 @@ async def test_create_duplicate_tag_fails(client, admin_token):
 
 @pytest.mark.asyncio
 async def test_update_tag_as_admin(client, admin_token, test_tag):
-    payload = {"name": "updated-name", "slug": test_tag.slug, "description": "updated"}
+    payload = {"name": "updated-name", "slug": test_tag.slug, "type": "general", "description": "updated"}
     headers = {"Authorization": f"Bearer {admin_token}"}
     r = await client.put(f"{API}/tags/{test_tag.slug}", json=payload, headers=headers)
     assert r.status_code == 200

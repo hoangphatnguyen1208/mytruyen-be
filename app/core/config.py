@@ -24,4 +24,6 @@ class Settings(BaseSettings):
     FIRST_ADMIN_EMAIL: str
     FIRST_ADMIN_PASSWORD: str
 
+    REDIS_URL: str
+
 settings = Settings()

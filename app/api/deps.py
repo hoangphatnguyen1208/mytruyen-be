@@ -49,3 +49,12 @@ def get_current_admin(current_user: CurrentUser) -> User:
     return current_user
 
 CurrentAdmin: TypeAlias = Annotated[User, Depends(get_current_admin)]
+
+from arq.connections import RedisSettings
+from arq import create_pool
+
+async def get_redis():
+    async with await create_pool(RedisSettings.from_dsn(settings.REDIS_URL)) as redis:
+        yield redis
+
+RedisDep: TypeAlias = Annotated[any, Depends(get_redis)]

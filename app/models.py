@@ -61,6 +61,7 @@ class Tag(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True, unique=True, nullable=False)
     slug: str = Field(index=True, unique=True, nullable=False)
+    type: str = Field(index=True, nullable=False)
     description: str | None = Field(default=None)
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
     updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})

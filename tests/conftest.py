@@ -144,6 +144,7 @@ async def test_tag(db_session: AsyncSession) -> Tag:
     tag = Tag(
         name="Adventure",
         slug="adventure",
+        type="general",
         description="Adventure tag"
     )
     db_session.add(tag)

@@ -6,6 +6,7 @@ from sqlmodel import SQLModel
 class TagBase(SQLModel):
     name: str
     slug: str
+    type: str
     description: str | None = None
 
 
