@@ -3,7 +3,6 @@ The HyperText Transfer Protocol (HTTP) 400 Bad Request response status code indi
 cannot or will not process the request due to something that is perceivedto be a client error
 (for example, malformed request syntax, invalid request message framing, or deceptive request routing).
 """
-
 import fastapi
 from fastapi import HTTPException
 
@@ -16,6 +15,7 @@ from app.utilities.messages.exceptions.http.exc_details import (
     http_400_genre_details,
     http_400_chapter_details,
     http_400_chapter_content_details,
+    http_400_tag_details,
 )
 
 
@@ -70,4 +70,10 @@ def http_exc_400_chapter_content_bad_request(slug: str):
     raise HTTPException(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
         detail=http_400_chapter_content_details(string=slug),
+    )
+
+def http_exc_400_tag_bad_request(string: str):
+    raise HTTPException(
+        status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+        detail=http_400_tag_details(string=string),
     )

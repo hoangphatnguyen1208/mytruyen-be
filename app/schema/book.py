@@ -63,4 +63,3 @@ class BookUpdate(SQLModel):
     genre_ids: list[uuid.UUID] | None = None
 
 
-

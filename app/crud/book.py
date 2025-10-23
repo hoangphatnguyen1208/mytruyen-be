@@ -3,7 +3,7 @@ from sqlmodel import select
 from sqlalchemy.orm import selectinload
 
 from app.models import Book, Genre
-from app.schema.book import BookCreate, BookUpdate, BookPublic
+from app.schema.book import BookCreate, BookUpdate
 
 async def create_book(session: AsyncSession, book_create: BookCreate) -> Book:
     db_book = Book.model_validate(book_create)

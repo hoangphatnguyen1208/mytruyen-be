@@ -25,6 +25,9 @@ def http_400_chapter_details(string: str) -> str:
 def http_400_chapter_content_details(string: str) -> str:
     return f"The chapter content with `{string}` already exists!"
 
+def http_400_tag_details(string: str) -> str:
+    return f"The tag with `{string}` already exists!"
+
 def http_401_unauthorized_details() -> str:
     return "Refused to complete request due to lack of valid authentication!"
 
@@ -55,3 +58,6 @@ def http_404_chapter_details(chapter_id: str) -> str:
 
 def http_404_chapter_content_details(chapter_id: str) -> str:
     return f"The chapter content for chapter with `{chapter_id}` doesn't exist"
+
+def http_404_tag_details(string: str) -> str:
+    return f"The tag with `{string}` doesn't exist"

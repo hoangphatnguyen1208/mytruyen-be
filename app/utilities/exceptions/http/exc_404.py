@@ -13,6 +13,7 @@ from app.utilities.messages.exceptions.http.exc_details import (
     http_404_book_details,
     http_404_genre_details,
     http_404_chapter_content_details,
+    http_404_tag_details,
 )
 
 
@@ -60,4 +61,10 @@ def http_404_exc_chapter_content_not_found_request(chapter_id: str):
     raise HTTPException(
         status_code=fastapi.status.HTTP_404_NOT_FOUND,
         detail=http_404_chapter_content_details(chapter_id=chapter_id),
+    )
+
+def http_404_exc_tag_not_found_request(string: str):
+    raise HTTPException(
+        status_code=fastapi.status.HTTP_404_NOT_FOUND,
+        detail=http_404_tag_details(string=string),
     )
