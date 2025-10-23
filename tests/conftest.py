@@ -18,7 +18,7 @@ from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.core.config import settings
 from app.api.deps import get_db
-from app.models import ChapterContent, Chapter, User, Book, Genre, user_role
+from app.models import ChapterContent, Chapter, User, Book, Genre, Tag, user_role
 from app.core.security import get_password_hash
 import uuid
 
@@ -136,6 +136,20 @@ async def test_genre(db_session: AsyncSession) -> Genre:
     await db_session.commit()
     await db_session.refresh(genre)
     return genre
+
+
+@pytest.fixture
+async def test_tag(db_session: AsyncSession) -> Tag:
+    """Tạo tag cho test"""
+    tag = Tag(
+        name="Adventure",
+        slug="adventure",
+        description="Adventure tag"
+    )
+    db_session.add(tag)
+    await db_session.commit()
+    await db_session.refresh(tag)
+    return tag
 
 
 @pytest.fixture

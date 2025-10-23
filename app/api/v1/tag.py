@@ -14,7 +14,7 @@ router = APIRouter(prefix="/tags", tags=["tag"])
 async def create_tag(session: SessionDep, current_admin: CurrentAdmin, tag_in: TagCreate):
     existing_tag = await tag_crud.get_tag_by_name(session, tag_in.name)
     if existing_tag:
-        raise http_exc_400_tag_bad_request(name=tag_in.name)
+        raise http_exc_400_tag_bad_request(string=tag_in.name)
     tag = await tag_crud.create_tag(session, tag_in)
     return tag
 
