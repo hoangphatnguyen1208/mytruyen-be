@@ -164,6 +164,7 @@ async def test_book(db_session: AsyncSession, test_admin: User) -> Book:
         status_id=1,  # Required field
         synopsis="Test book description",  # Đổi từ description -> synopsis
         author_id=test_admin.id,
+        creator_id=test_admin.id,
         poster={
             "poster_default": "http://example.com/poster.jpg",
             "poster_600": "http://example.com/poster_600.jpg",

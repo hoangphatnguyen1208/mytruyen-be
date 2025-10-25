@@ -10,7 +10,7 @@ class TestBook:
     """Test class cho book endpoints"""
 
     @pytest.mark.asyncio
-    async def test_create_book_success(self, client: AsyncClient, admin_token: str, test_genre):
+    async def test_create_book_success(self, client: AsyncClient, admin_token: str, test_genre, test_tag):
         """Test tạo book mới thành công (admin)"""
         response = await client.post(
             f"{settings.API_V1_STR}/books",
@@ -25,6 +25,7 @@ class TestBook:
                 "synopsis": "New book synopsis",
                 "note": "Test note",
                 "genre_ids": [test_genre.id],
+                "tag_ids": [test_tag.id],
                 "poster": {
                     "poster_default": "http://example.com/poster.jpg",
                     "poster_600": "http://example.com/poster_600.jpg",
@@ -41,7 +42,7 @@ class TestBook:
 
     @pytest.mark.asyncio
     async def test_create_book_duplicate_slug(
-        self, client: AsyncClient, admin_token: str, test_book, test_genre
+        self, client: AsyncClient, admin_token: str, test_book, test_genre, test_tag
     ):
         """Test tạo book với slug đã tồn tại"""
         response = await client.post(
@@ -57,6 +58,7 @@ class TestBook:
                 "synopsis": "Duplicate book synopsis",
                 "note": "Test note",
                 "genre_ids": [test_genre.id],
+                "tag_ids": [test_tag.id],
                 "poster": {
                     "poster_default": "http://example.com/poster.jpg",
                     "poster_600": "http://example.com/poster_600.jpg",
@@ -70,7 +72,7 @@ class TestBook:
         assert response.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_create_book_without_auth(self, client: AsyncClient, test_genre):
+    async def test_create_book_without_auth(self, client: AsyncClient, test_genre, test_tag):
         """Test tạo book không có authentication"""
         response = await client.post(
             f"{settings.API_V1_STR}/books",
@@ -85,6 +87,7 @@ class TestBook:
                 "synopsis": "New book synopsis",
                 "note": "Test note",
                 "genre_ids": [str(test_genre.id)],
+                "tag_ids": [str(test_tag.id)],
                 "poster": {
                     "poster_default": "http://example.com/poster.jpg",
                     "poster_600": "http://example.com/poster_600.jpg",
@@ -97,7 +100,7 @@ class TestBook:
 
     @pytest.mark.asyncio
     async def test_create_book_as_user(
-        self, client: AsyncClient, user_token: str, test_genre
+        self, client: AsyncClient, user_token: str, test_genre, test_tag
     ):
         """Test tạo book với user thông thường (không phải admin)"""
         response = await client.post(
@@ -113,6 +116,7 @@ class TestBook:
                 "synopsis": "User book synopsis",
                 "note": "Test note",
                 "genre_ids": [str(test_genre.id)],
+                "tag_ids": [str(test_tag.id)],
                 "poster": {
                     "poster_default": "http://example.com/poster.jpg",
                     "poster_600": "http://example.com/poster_600.jpg",

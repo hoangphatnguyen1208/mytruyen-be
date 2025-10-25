@@ -16,7 +16,7 @@ async def create_book(session: SessionDep, current_admin: CurrentAdmin, book_reg
     existing_book = await crud_book.get_book_by_slug(session, book_register.slug)
     if existing_book:
         raise http_400_exc_bad_book_request(slug=book_register.slug)
-    book_in = BookCreate.model_validate(book_register, update={"author_id": str(current_admin.id), "poster": book_register.poster.model_dump()})
+    book_in = BookCreate.model_validate(book_register, update={"creator_id": str(current_admin.id), "poster": book_register.poster.model_dump()})
     db_book = await crud_book.create_book(session, book_in)
     return db_book
 

@@ -36,7 +36,7 @@ async def test_create_tag_as_admin(client, admin_token):
     payload = {"name": "new-tag-admin", "slug": "new-tag-admin", "type": "general", "description": "desc"}
     headers = {"Authorization": f"Bearer {admin_token}"}
     response = await client.post(f"{API}/tags", json=payload, headers=headers)
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.json()
     assert data["name"] == payload["name"]
     assert data["slug"] == payload["slug"]
@@ -48,8 +48,7 @@ async def test_create_duplicate_tag_fails(client, admin_token):
     headers = {"Authorization": f"Bearer {admin_token}"}
     # first create
     r1 = await client.post(f"{API}/tags", json=payload, headers=headers)
-    assert r1.status_code == 200
-    # second create with same name should fail with 400
+    assert r1.status_code == 201
     r2 = await client.post(f"{API}/tags", json=payload, headers=headers)
     assert r2.status_code == 400
 

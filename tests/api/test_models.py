@@ -68,6 +68,7 @@ class TestModels:
             slug="model-test-book",
             description="Test description",
             author_id=test_admin.id,
+            creator_id=test_admin.id,
             poster={"url": "http://example.com/poster.jpg"}, 
             published=True,
             note="Test note",
@@ -85,16 +86,16 @@ class TestModels:
         assert book.author_id == test_admin.id
 
     @pytest.mark.asyncio
-    async def test_book_author_relationship(
+    async def test_book_creator_relationship(
         self, db_session: AsyncSession, test_admin, test_book
     ):
-        """Test relationship giữa Book và User (author)"""
-        # Load author relationship
-        await db_session.refresh(test_book, ["author"])
+        """Test relationship giữa Book và User (creator)"""
+        # Load creator relationship
+        await db_session.refresh(test_book, ["creator"])
         
-        assert test_book.author is not None
-        assert test_book.author.id == test_admin.id
-        assert test_book.author.email == "admin@example.com"
+        assert test_book.creator is not None
+        assert test_book.creator.id == test_admin.id
+        assert test_book.creator.email == "admin@example.com"
 
     @pytest.mark.asyncio
     async def test_user_books_relationship(

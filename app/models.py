@@ -34,6 +34,17 @@ class User(SQLModel, table=True):
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
     updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
 
+    books: list["Book"] = Relationship(back_populates="creator")
+
+class Author(SQLModel, table=True):
+    __tablename__ = "author"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(index=True, unique=True, nullable=False)
+    local_name: str | None = Field(default=None)
+    avatar: str | None = Field(default=None)
+    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
+    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+
     books: list["Book"] = Relationship(back_populates="author")
 class BookStatus(SQLModel, table=True):
     __tablename__ = "book_status"
@@ -81,7 +92,8 @@ class Genre(SQLModel, table=True):
 class Book(SQLModel, table=True):
     __tablename__ = "book"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    author_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
+    author_id: uuid.UUID | None = Field(default=None, foreign_key="author.id", nullable=True)
+    creator_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
     name: str = Field(index=True, nullable=False)
     slug: str = Field(index=True, unique=True, nullable=False)
     kind: int = Field(index=True, nullable=False)
@@ -107,7 +119,8 @@ class Book(SQLModel, table=True):
     tags: list[Tag] = Relationship(back_populates="books", link_model=BookTag, sa_relationship_kwargs={"lazy": "selectin"})
     genres: list[Genre] = Relationship(back_populates="books", link_model=BookGenre, sa_relationship_kwargs={"lazy": "selectin"})
     status: BookStatus = Relationship(back_populates="books", sa_relationship_kwargs={"lazy": "selectin"})
-    author: User = Relationship(back_populates="books", sa_relationship_kwargs={"lazy": "selectin"})
+    author: Author = Relationship(back_populates="books", sa_relationship_kwargs={"lazy": "selectin"})
+    creator: User = Relationship(back_populates="books", sa_relationship_kwargs={"lazy": "selectin"})
     
 class Chapter(SQLModel, table=True):
     __tablename__ = "chapter"

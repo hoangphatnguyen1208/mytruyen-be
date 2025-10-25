@@ -10,7 +10,7 @@ from app.utilities.exceptions.http.exc_404 import http_404_exc_tag_not_found_req
 
 router = APIRouter(prefix="/tags", tags=["tag"])
 
-@router.post("", response_model=TagPublic)
+@router.post("", response_model=TagPublic, status_code=201)
 async def create_tag(session: SessionDep, current_admin: CurrentAdmin, tag_in: TagCreate):
     existing_tag = await tag_crud.get_tag_by_name(session, tag_in.name)
     if existing_tag:

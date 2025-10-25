@@ -2,6 +2,7 @@ from sqlmodel import SQLModel
 from pydantic import ConfigDict
 from app.schema.user import UserPublic
 from app.schema.genre import GenrePublic
+from app.schema.author import AuthorPublic
 
 from datetime import datetime
 import uuid
@@ -22,13 +23,15 @@ class BookBase(SQLModel):
     synopsis: str
     note: str
     
-
 class BookRegister(BookBase):
+    author_id: uuid.UUID | None = None
     genre_ids: list[int]
+    tag_ids: list[int]
     poster: Poster
 
 class BookCreate(BookBase):
-    author_id: uuid.UUID
+    author_id: uuid.UUID | None = None
+    creator_id: uuid.UUID
     genre_ids: list[int]
     poster: dict
 
@@ -47,7 +50,8 @@ class BookPublic(BookBase):
     updated_at: datetime
     published_at: datetime | None
     
-    author: UserPublic
+    author: AuthorPublic | None
+    creator: UserPublic
     genres: list[GenrePublic] 
 
 class BookUpdate(SQLModel):
@@ -61,5 +65,8 @@ class BookUpdate(SQLModel):
     synopsis: str | None = None
     note: str | None = None
     genre_ids: list[uuid.UUID] | None = None
+    tag_ids: list[uuid.UUID] | None = None
+    poster: Poster | None = None
+
 
 

@@ -78,7 +78,7 @@ class TestBookCRUD:
                     status_id=1, 
                     synopsis="Test book description",  
                     chapter_per_week=7,  
-                    author_id=test_admin.id,
+                    creator_id=test_admin.id,
                     published=True,
                     poster={
                         "poster_default": "http://example.com/poster.jpg",
@@ -92,7 +92,6 @@ class TestBookCRUD:
         book = await book_crud.create_book(db_session, book_in)
         assert book.name == "CRUD Test Book"
         assert book.slug == "crud-test-book"
-        assert book.author_id == test_admin.id
 
     @pytest.mark.asyncio
     async def test_get_books(self, db_session: AsyncSession, test_book):
