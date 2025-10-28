@@ -20,7 +20,7 @@ RUN python -m pip install --upgrade pip setuptools wheel
 
 # Install runtime dependencies
 RUN pip install uv \
-    && uv sync
+    && uv sync --system
     
 
 # Production image
