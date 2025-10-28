@@ -8,34 +8,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=ghcr.io/astral-sh/uv:0.9.5 /uv /uvx /bin/
+COPY . ./app
+
 WORKDIR /app
-ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+RUN uv sync --frozen --no-cache
 
-# Dependency installation
-COPY uv.lock pyproject.toml ./
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --no-install-project --no-dev
-
-# Project installation
-COPY . .
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
 # Production image
 FROM python:3.12-slim
 
-ENV PATH="/app/.venv/bin:$PATH"
+# Tạo user không có quyền root để tăng bảo mật
 RUN groupadd -g 1001 app && \
-    useradd -u 1001 -g app -m -d /app -s /bin/false app
+    useradd -u 1001 -g app -m -d /app -s /usr/sbin/nologin app
 
+# Thiết lập thư mục làm việc
 WORKDIR /app
 
-COPY --from=builder --chown=app:app /app .
+# Sao chép ứng dụng và virtual environment từ builder
+COPY --from=builder --chown=app:app /app /app
 
-# Expose port
+# Thêm thư mục .venv vào PATH để lệnh "uv" hoặc "fastapi" có thể chạy trực tiếp
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Mở cổng chạy app (ví dụ FastAPI)
 EXPOSE 8000
 
-# Run as non-root
+# Chuyển sang user không phải root
 USER app
-
-
