@@ -17,7 +17,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-cache
 
 # 3. Copy toàn bộ source code
-COPY . .
+COPY . ./app
 
 # Production image
 FROM python:3.12-slim
