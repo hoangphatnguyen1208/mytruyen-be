@@ -10,12 +10,14 @@ from app.utilities.messages.exceptions.http.exc_details import (
     http_400_email_details,
     http_400_sigin_credentials_details,
     http_400_signup_credentials_details,
+    http_400_status_details,
     http_400_username_details,
     http_400_book_details,
     http_400_genre_details,
     http_400_chapter_details,
     http_400_chapter_content_details,
     http_400_tag_details,
+    http_400_author_details,
 )
 
 
@@ -33,21 +35,21 @@ def http_exc_400_credentials_bad_signin_request():
     )
 
 
-def http_400_exc_bad_username_request(username: str):
+def http_exc_400_bad_username_request(username: str):
     raise HTTPException(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
         detail=http_400_username_details(username=username),
     )
 
 
-def http_400_exc_bad_email_request(email: str):
+def http_exc_400_bad_email_request(email: str):
     raise HTTPException(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
         detail=http_400_email_details(email=email),
     )
 
 
-def http_400_exc_bad_book_request(slug: str):
+def http_exc_400_bad_book_request(slug: str):
     raise HTTPException(
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
         detail=http_400_book_details(string=slug),
@@ -77,3 +79,15 @@ def http_exc_400_tag_bad_request(string: str):
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
         detail=http_400_tag_details(string=string),
     )
+
+def http_exc_400_author_bad_request(string: str):
+    raise HTTPException(
+        status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+        detail=http_400_author_details(string=string),
+    )
+
+def http_exc_400_status_bad_request(string: str):
+    raise HTTPException(
+        status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+        detail=http_400_status_details(string=string),
+    )   

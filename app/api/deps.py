@@ -5,8 +5,8 @@ from typing import Annotated, TypeAlias
 from sqlmodel.ext.asyncio.session import AsyncSession
 import uuid
 
-from app.utilities.exceptions.http.exc_403 import http_403_exc_forbidden_request
-from app.utilities.exceptions.http.exc_404 import http_404_exc_id_not_found_request
+from app.utilities.exceptions.http.exc_403 import http_exc_403_forbidden_request
+from app.utilities.exceptions.http.exc_404 import http_exc_404_id_not_found_request
 
 from app.core.config import settings
 from app.core.db import async_engine
@@ -29,13 +29,13 @@ async def get_current_user(session: SessionDep, token: TokenDep):
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         id = payload.get("sub")
     except jwt.PyJWTError:
-        raise http_403_exc_forbidden_request()
+        raise http_exc_403_forbidden_request()
     if not id:
-        raise http_403_exc_forbidden_request()
+        raise http_exc_403_forbidden_request()
     id = uuid.UUID(id)
     user = await crud_user.get_user_by_id(session, id)
     if not user:
-        raise http_404_exc_id_not_found_request()
+        raise http_exc_404_id_not_found_request()
     return user
 
 CurrentUser: TypeAlias = Annotated[User, Depends(get_current_user)]

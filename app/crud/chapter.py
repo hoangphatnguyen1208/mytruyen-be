@@ -38,7 +38,7 @@ async def update_chapter(session: AsyncSession, chapter_id: uuid.UUID, chapter_i
     await session.refresh(chapter)
     return chapter
 
-async def delete_chapter(session: AsyncSession, chapter_id: str) -> bool:
+async def delete_chapter(session: AsyncSession, chapter_id: uuid.UUID) -> bool:
     chapter = await get_chapter_by_id(session, chapter_id)
     await session.delete(chapter)
     await session.commit()
@@ -51,12 +51,12 @@ async def create_chapter_content(session: AsyncSession, content_in: ChapterConte
     await session.refresh(content)
     return content
 
-async def get_chapter_content_by_chapter_id(session: AsyncSession, chapter_id: str) -> ChapterContent | None:
+async def get_chapter_content_by_chapter_id(session: AsyncSession, chapter_id: uuid.UUID) -> ChapterContent | None:
     statement = select(ChapterContent).where(ChapterContent.chapter_id == chapter_id)
     result = await session.exec(statement)
     return result.first()
 
-async def update_chapter_content(session: AsyncSession, chapter_id: str, content_in: ChapterContentCreate) -> ChapterContent:
+async def update_chapter_content(session: AsyncSession, chapter_id: uuid.UUID, content_in: ChapterContentCreate) -> ChapterContent:
     content_data = content_in.model_dump()
     content_data = {k: v for k, v in content_data.items() if k in content_in.model_fields_set}
     content = await get_chapter_content_by_chapter_id(session, chapter_id)
@@ -66,7 +66,7 @@ async def update_chapter_content(session: AsyncSession, chapter_id: str, content
     await session.refresh(content)
     return content
 
-async def delete_chapter_content(session: AsyncSession, content_id: str) -> bool:
+async def delete_chapter_content(session: AsyncSession, content_id: uuid.UUID) -> bool:
     content = await get_chapter_content_by_chapter_id(session, content_id)
     await session.delete(content)
     await session.commit()

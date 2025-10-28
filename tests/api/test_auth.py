@@ -1,5 +1,5 @@
 """
-Test cases cho Authentication endpoints
+Test cases for Authentication endpoints
 """
 import pytest
 from httpx import AsyncClient

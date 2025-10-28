@@ -16,7 +16,7 @@ from app.crud import (
 
 from app.utilities.exceptions.http.exc_400 import (
     http_exc_400_credentials_bad_signin_request,
-    http_400_exc_bad_email_request
+    http_exc_400_bad_email_request
 )
 
 
@@ -52,7 +52,7 @@ async def login(session: SessionDep, user_login: UserLogin):
 async def register(session: SessionDep, user_register: UserRegister):
     existing_user = await user_crud.get_user_by_email(session, user_register.email)
     if existing_user:
-        raise http_400_exc_bad_email_request(email=user_register.email)
+        raise http_exc_400_bad_email_request(email=user_register.email)
     user = await user_crud.create_user(session, user_register)
     return {"message": "User registered successfully"}
 

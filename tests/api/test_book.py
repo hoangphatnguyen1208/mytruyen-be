@@ -27,15 +27,15 @@ class TestBook:
                 "genre_ids": [test_genre.id],
                 "tag_ids": [test_tag.id],
                 "poster": {
-                    "poster_default": "http://example.com/poster.jpg",
-                    "poster_600": "http://example.com/poster_600.jpg",
-                    "poster_300": "http://example.com/poster_300.jpg",
-                    "poster_150": "http://example.com/poster_150.jpg"
+                    "default": "http://example.com/poster.jpg",
+                    "600": "http://example.com/poster_600.jpg",
+                    "300": "http://example.com/poster_300.jpg",
+                    "150": "http://example.com/poster_150.jpg"
                 }
             },
             headers={"Authorization": f"Bearer {admin_token}"}
         )
-        assert response.status_code == 200
+        assert response.status_code == 201
         data = response.json()
         assert data["name"] == "New Book"
         assert data["slug"] == "new-book"
@@ -60,10 +60,10 @@ class TestBook:
                 "genre_ids": [test_genre.id],
                 "tag_ids": [test_tag.id],
                 "poster": {
-                    "poster_default": "http://example.com/poster.jpg",
-                    "poster_600": "http://example.com/poster_600.jpg",
-                    "poster_300": "http://example.com/poster_300.jpg",
-                    "poster_150": "http://example.com/poster_150.jpg"
+                    "default": "http://example.com/poster.jpg",
+                    "600": "http://example.com/poster_600.jpg",
+                    "300": "http://example.com/poster_300.jpg",
+                    "150": "http://example.com/poster_150.jpg"
                 }
             },
             headers={"Authorization": f"Bearer {admin_token}"}
@@ -89,10 +89,10 @@ class TestBook:
                 "genre_ids": [str(test_genre.id)],
                 "tag_ids": [str(test_tag.id)],
                 "poster": {
-                    "poster_default": "http://example.com/poster.jpg",
-                    "poster_600": "http://example.com/poster_600.jpg",
-                    "poster_300": "http://example.com/poster_300.jpg",
-                    "poster_150": "http://example.com/poster_150.jpg"
+                    "default": "http://example.com/poster.jpg",
+                    "600": "http://example.com/poster_600.jpg",
+                    "300": "http://example.com/poster_300.jpg",
+                    "150": "http://example.com/poster_150.jpg"
                 }
             }
         )
@@ -118,10 +118,10 @@ class TestBook:
                 "genre_ids": [str(test_genre.id)],
                 "tag_ids": [str(test_tag.id)],
                 "poster": {
-                    "poster_default": "http://example.com/poster.jpg",
-                    "poster_600": "http://example.com/poster_600.jpg",
-                    "poster_300": "http://example.com/poster_300.jpg",
-                    "poster_150": "http://example.com/poster_150.jpg"
+                    "default": "http://example.com/poster.jpg",
+                    "600": "http://example.com/poster_600.jpg",
+                    "300": "http://example.com/poster_300.jpg",
+                    "150": "http://example.com/poster_150.jpg"
                 }
             },
             headers={"Authorization": f"Bearer {user_token}"}

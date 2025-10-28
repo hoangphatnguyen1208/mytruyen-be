@@ -57,7 +57,7 @@ async def test_create_duplicate_tag_fails(client, admin_token):
 async def test_update_tag_as_admin(client, admin_token, test_tag):
     payload = {"name": "updated-name", "slug": test_tag.slug, "type": "general", "description": "updated"}
     headers = {"Authorization": f"Bearer {admin_token}"}
-    r = await client.put(f"{API}/tags/{test_tag.slug}", json=payload, headers=headers)
+    r = await client.patch(f"{API}/tags/{test_tag.slug}", json=payload, headers=headers)
     assert r.status_code == 200
     data = r.json()
     assert data["name"] == payload["name"]

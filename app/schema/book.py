@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel
-from pydantic import ConfigDict
+from pydantic import ConfigDict, Field
 from app.schema.user import UserPublic
 from app.schema.genre import GenrePublic
 from app.schema.author import AuthorPublic
@@ -7,11 +7,6 @@ from app.schema.author import AuthorPublic
 from datetime import datetime
 import uuid
 
-class Poster(SQLModel):
-    poster_default: str
-    poster_600: str
-    poster_300: str
-    poster_150: str
 class BookBase(SQLModel):
     name: str
     slug: str
@@ -22,18 +17,19 @@ class BookBase(SQLModel):
     published: bool
     synopsis: str
     note: str
+    poster: dict
+    chapter_count: int = 0
+    word_count: int = 0
     
 class BookRegister(BookBase):
     author_id: uuid.UUID | None = None
     genre_ids: list[int]
     tag_ids: list[int]
-    poster: Poster
 
 class BookCreate(BookBase):
     author_id: uuid.UUID | None = None
     creator_id: uuid.UUID
     genre_ids: list[int]
-    poster: dict
 
 class BookPublic(BookBase):
     id: uuid.UUID
@@ -45,7 +41,6 @@ class BookPublic(BookBase):
     review_count: int
     average_rating: float
     bookmark_count: int
-    poster: Poster
     created_at: datetime
     updated_at: datetime
     published_at: datetime | None
@@ -66,7 +61,14 @@ class BookUpdate(SQLModel):
     note: str | None = None
     genre_ids: list[uuid.UUID] | None = None
     tag_ids: list[uuid.UUID] | None = None
-    poster: Poster | None = None
+    poster: dict | None = None
+    chapter_count: int | None = None
+    view_count: int | None = None
+    word_count: int | None = None
+    comment_count: int | None = None
+    review_count: int | None = None
+    average_rating: float | None = None
+    bookmark_count: int | None = None
 
 
 

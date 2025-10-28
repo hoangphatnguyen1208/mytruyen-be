@@ -22,7 +22,7 @@ class TestChapterAPI:
 
     @pytest.mark.asyncio
     async def test_list_chapters_for_book(self, client: AsyncClient, test_book, test_chapter):
-        resp = await client.get(f"{settings.API_V1_STR}/chapter/{test_book.id}")
+        resp = await client.get(f"{settings.API_V1_STR}/chapters/{test_book.id}")
         assert resp.status_code == 200
         data = resp.json()
         assert isinstance(data, list)
@@ -31,13 +31,14 @@ class TestChapterAPI:
     @pytest.mark.asyncio
     async def test_create_chapter_requires_admin(self, client: AsyncClient, test_book, user_token: str):
         resp = await client.post(
-            f"{settings.API_V1_STR}/chapter/{test_book.id}",
+            f"{settings.API_V1_STR}/chapters/{test_book.id}",
             json={
                 "chapter_id": "ch-2",
                 "chapter_index": 2,
-                "title": "Unauthorized Chapter",
+                "name": "Unauthorized Chapter",
                 "content": "...",
-                "published": False
+                "published": False,
+                "word_count": 1000
             },
             headers={"Authorization": f"Bearer {user_token}"}
         )
@@ -46,12 +47,13 @@ class TestChapterAPI:
     @pytest.mark.asyncio
     async def test_create_chapter_success_as_admin(self, client: AsyncClient, test_book, admin_token: str):
         resp = await client.post(
-            f"{settings.API_V1_STR}/chapter/{test_book.id}",
+            f"{settings.API_V1_STR}/chapters/{test_book.id}",
             json={
                 "book_id": str(test_book.id),
                 "index": 2,
                 "name": "New Chapter",
-                "published": True
+                "published": True,
+                "word_count": 1000
             },
             headers={"Authorization": f"Bearer {admin_token}"}
         )
@@ -62,7 +64,7 @@ class TestChapterAPI:
     @pytest.mark.asyncio
     async def test_update_chapter_success_as_admin(self, client: AsyncClient, test_chapter, admin_token: str):
         resp = await client.patch(
-            f"{settings.API_V1_STR}/chapter/{test_chapter.id}",
+            f"{settings.API_V1_STR}/chapters/{test_chapter.id}",
             json={
                 "index": test_chapter.index,
                 "name": "Updated Title",
@@ -77,11 +79,12 @@ class TestChapterAPI:
     @pytest.mark.asyncio
     async def test_update_chapter_not_found(self, client: AsyncClient, admin_token: str):
         resp = await client.patch(
-            f"{settings.API_V1_STR}/chapter/{uuid.uuid4()}",
+            f"{settings.API_V1_STR}/chapters/{uuid.uuid4()}",
             json={
                 "index": 1,
                 "name": "Nonexistent Chapter",
-                "published": True
+                "published": True,
+                "word_count": 1000
             },
             headers={"Authorization": f"Bearer {admin_token}"}
         )
@@ -89,40 +92,41 @@ class TestChapterAPI:
 
     @pytest.mark.asyncio
     async def test_get_chapter_by_id(self, client: AsyncClient, test_chapter):
-        resp = await client.get(f"{settings.API_V1_STR}/chapter/{test_chapter.book_id}")
+        resp = await client.get(f"{settings.API_V1_STR}/chapters/{test_chapter.book_id}")
         assert resp.status_code == 200
         data = resp.json()
         assert any(ch.get("id") == str(test_chapter.id) for ch in data)
 
     @pytest.mark.asyncio
-    async def test_get_chapter_content_success(self, client: AsyncClient, test_chapter_content):
-        resp = await client.get(f"{settings.API_V1_STR}/chapter/content/{test_chapter_content.chapter_id}")
+    async def test_get_chapter_content_success(self, client: AsyncClient, test_chapter):
+        resp = await client.get(f"{settings.API_V1_STR}/chapters/content/{test_chapter.id}")
         assert resp.status_code == 200
         data = resp.json()
-        assert data.get("id") == str(test_chapter_content.id)
+        assert data.get("id") == str(test_chapter.id)
 
     @pytest.mark.asyncio
     async def test_get_chapter_content_not_found(self, client: AsyncClient):
-        resp = await client.get(f"{settings.API_V1_STR}/chapter/content/{uuid.uuid4()}")
+        resp = await client.get(f"{settings.API_V1_STR}/chapters/content/{uuid.uuid4()}")
         assert resp.status_code == 404
 
     @pytest.mark.asyncio
     async def test_create_chapter_content_as_admin(self, client: AsyncClient, test_chapter, admin_token: str):
         resp = await client.post(
-            f"{settings.API_V1_STR}/chapter/content/{test_chapter.id}",
+            f"{settings.API_V1_STR}/chapters/content/{test_chapter.id}",
             json={"content": "This is chapter content."},
             headers={"Authorization": f"Bearer {admin_token}"}
         )
-        assert resp.status_code in (200, 400)
+        assert resp.status_code == 200
 
     @pytest.mark.asyncio
     async def test_create_chapter_duplicate_index(self, client: AsyncClient, test_book, admin_token: str, test_chapter):
         resp = await client.post(
-            f"{settings.API_V1_STR}/chapter/{test_book.id}",
+            f"{settings.API_V1_STR}/chapters/{test_book.id}",
             json={
                 "book_id": str(test_book.id),
                 "index": test_chapter.index,
                 "name": "Duplicate",
+                "word_count": 1000,
                 "published": False
             },
             headers={"Authorization": f"Bearer {admin_token}"}
@@ -132,7 +136,7 @@ class TestChapterAPI:
     @pytest.mark.asyncio
     async def test_content_requires_admin_for_create(self, client: AsyncClient, test_chapter, user_token: str):
         resp = await client.post(
-            f"{settings.API_V1_STR}/chapter/content/{test_chapter.id}",
+            f"{settings.API_V1_STR}/chapters/content/{test_chapter.id}",
             json={"content": "attempt"},
             headers={"Authorization": f"Bearer {user_token}"}
         )
@@ -141,7 +145,7 @@ class TestChapterAPI:
     @pytest.mark.asyncio
     async def test_update_chapter_content_as_user(self, client: AsyncClient, test_chapter, user_token: str):
         resp = await client.patch(
-            f"{settings.API_V1_STR}/chapter/content/{test_chapter.id}",
+            f"{settings.API_V1_STR}/chapters/content/{test_chapter.id}",
             json={"content": "attempt"},
             headers={"Authorization": f"Bearer {user_token}"}
         )

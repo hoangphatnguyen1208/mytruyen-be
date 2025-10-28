@@ -48,7 +48,7 @@ class Author(SQLModel, table=True):
     books: list["Book"] = Relationship(back_populates="author")
 class BookStatus(SQLModel, table=True):
     __tablename__ = "book_status"
-    id: int | None = Field(default=None, primary_key=True)
+    id: int = Field(default=None, primary_key=True)
     name: str = Field(index=True, unique=True, nullable=False)
     slug: str = Field(index=True, unique=True, nullable=False)
     description: str | None = Field(default=None)
@@ -125,7 +125,7 @@ class Book(SQLModel, table=True):
 class Chapter(SQLModel, table=True):
     __tablename__ = "chapter"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    author_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
+    creator_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
     book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False)
     name: str = Field(index=True, nullable=False)
     index: int = Field(nullable=False)

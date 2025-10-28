@@ -18,7 +18,7 @@ from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.core.config import settings
 from app.api.deps import get_db
-from app.models import ChapterContent, Chapter, User, Book, Genre, Tag, user_role
+from app.models import Author, ChapterContent, Chapter, User, Book, Genre, Tag, user_role
 from app.core.security import get_password_hash
 import uuid
 
@@ -182,7 +182,7 @@ async def test_book(db_session: AsyncSession, test_admin: User) -> Book:
 async def test_chapter(db_session: AsyncSession, test_book: Book, test_admin: User) -> None:
     """Tạo chapter cho test"""
     chapter = Chapter(
-        author_id=test_admin.id,
+        creator_id=test_admin.id,
         book_id=test_book.id,
         index=1,
         name="Chapter 1",
@@ -206,6 +206,18 @@ async def test_chapter_content(db_session: AsyncSession, test_chapter: Chapter) 
     await db_session.commit()
     await db_session.refresh(chapter_content)
     return chapter_content
+
+@pytest.fixture
+async def test_author(db_session: AsyncSession) -> Author:
+    """Tạo author cho test"""
+    author = Author(
+        name="Test Author",
+        local_name="Test Author Local"
+    )
+    db_session.add(author)
+    await db_session.commit()
+    await db_session.refresh(author)
+    return author
 
 @pytest.fixture
 async def user_token(client: AsyncClient, test_user: User) -> str:

@@ -60,7 +60,7 @@ class TestGenre:
     @pytest.mark.asyncio
     async def test_update_genre_success(self, client: AsyncClient, test_genre, admin_token: str):
         """Test update genre thành công với admin token"""
-        response = await client.put(
+        response = await client.patch(
             f"{settings.API_V1_STR}/genres/update/{test_genre.id}",
             json={
                 "name": "Updated Fantasy",
@@ -77,7 +77,7 @@ class TestGenre:
     async def test_update_genre_not_found(self, client: AsyncClient, admin_token: str):
         """Test update genre không tồn tại với admin token"""
         fake_id = 1000
-        response = await client.put(
+        response = await client.patch(
             f"{settings.API_V1_STR}/genres/update/{fake_id}",
             json={
                 "name": "Updated Genre"
@@ -116,7 +116,7 @@ class TestGenre:
     @pytest.mark.asyncio
     async def test_update_genre_without_auth(self, client: AsyncClient, test_genre):
         """Test update genre không có authentication - phải fail"""
-        response = await client.put(
+        response = await client.patch(
             f"{settings.API_V1_STR}/genres/update/{test_genre.id}",
             json={
                 "name": "Updated Fantasy"
@@ -127,7 +127,7 @@ class TestGenre:
     @pytest.mark.asyncio
     async def test_update_genre_non_admin(self, client: AsyncClient, test_genre, user_token: str):
         """Test update genre với user thông thường - phải bị forbidden"""
-        response = await client.put(
+        response = await client.patch(
             f"{settings.API_V1_STR}/genres/update/{test_genre.id}",
             json={
                 "name": "Updated Fantasy"

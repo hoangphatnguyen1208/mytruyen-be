@@ -8,7 +8,7 @@ from fastapi import HTTPException
 from app.utilities.messages.exceptions.http.exc_details import http_403_forbidden_details
 
 
-def http_403_exc_forbidden_request():
+def http_exc_403_forbidden_request():
     raise HTTPException(
         status_code=fastapi.status.HTTP_403_FORBIDDEN,
         detail=http_403_forbidden_details(),

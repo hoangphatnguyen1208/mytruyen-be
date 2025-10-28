@@ -7,7 +7,7 @@ from app.api.deps import SessionDep, CurrentAdmin
 from app.schema.genre import GenreCreate, GenreUpdate, GenrePublic
 from app.crud import genre as genre_crud
 
-from app.utilities.exceptions.http.exc_404 import http_404_exc_genre_not_found
+from app.utilities.exceptions.http.exc_404 import http_exc_404_genre_not_found
 from app.utilities.exceptions.http.exc_400 import http_exc_400_genre_bad_request
 
 router = APIRouter(prefix="/genres", tags=["Genre"])
@@ -27,14 +27,14 @@ async def read_genres(session: SessionDep):
 async def read_genre(session: SessionDep, slug: str):
     genre_db =  await genre_crud.get_genre_by_slug(session, slug)
     if not genre_db:
-        raise http_404_exc_genre_not_found(genre_id=slug)
+        raise http_exc_404_genre_not_found(genre_id=slug)
     return genre_db
 
-@router.put("/update/{genre_id}", response_model=GenrePublic)
+@router.patch("/update/{genre_id}", response_model=GenrePublic)
 async def update_genre(session: SessionDep, genre_id: int, genre_in: GenreUpdate, current_admin: CurrentAdmin):
     genre_db = await genre_crud.get_genre_by_id(session, genre_id)
     if not genre_db:
-        raise http_404_exc_genre_not_found(genre_id=genre_id)
+        raise http_exc_404_genre_not_found(genre_id=genre_id)
     genre = await genre_crud.update_genre(session, genre_id, genre_in)
     return genre
 
@@ -43,6 +43,6 @@ async def delete_genre(session: SessionDep, genre_id: int, current_admin: Curren
     print(genre_id)
     genre_db = await genre_crud.get_genre_by_id(session, genre_id)
     if not genre_db:
-        raise http_404_exc_genre_not_found(genre_id=genre_id)
+        raise http_exc_404_genre_not_found(genre_id=genre_id)
     await genre_crud.delete_genre(session, genre_id)
     return {"message": "Genre deleted successfully"}

@@ -5,7 +5,7 @@ from app.crud import tag as tag_crud
 from app.schema.tag import TagCreate, TagPublic, TagUpdate
 
 from app.utilities.exceptions.http.exc_400 import http_exc_400_tag_bad_request
-from app.utilities.exceptions.http.exc_404 import http_404_exc_tag_not_found_request
+from app.utilities.exceptions.http.exc_404 import http_exc_404_tag_not_found_request
 
 
 router = APIRouter(prefix="/tags", tags=["tag"])
@@ -27,14 +27,14 @@ async def get_tags(session: SessionDep):
 async def get_tag_by_slug(session: SessionDep, slug: str):
     tag = await tag_crud.get_tag_by_slug(session, slug)
     if not tag:
-        raise http_404_exc_tag_not_found_request(string=slug)
+        raise http_exc_404_tag_not_found_request(string=slug)
     return tag
 
-@router.put("/{slug}", response_model=TagPublic)
+@router.patch("/{slug}", response_model=TagPublic)
 async def update_tag(session: SessionDep, slug: str, tag_in: TagUpdate):
     existing_tag = await tag_crud.get_tag_by_slug(session, slug)
     if not existing_tag:
-        raise http_404_exc_tag_not_found_request(string=slug)
+        raise http_exc_404_tag_not_found_request(string=slug)
     updated_tag = await tag_crud.update_tag(session, existing_tag.id, tag_in)
     return updated_tag
 
@@ -42,7 +42,7 @@ async def update_tag(session: SessionDep, slug: str, tag_in: TagUpdate):
 async def delete_tag(session: SessionDep, slug: str, current_admin: CurrentAdmin):
     existing_tag = await tag_crud.get_tag_by_slug(session, slug)
     if not existing_tag:
-        raise http_404_exc_tag_not_found_request(string=slug)
+        raise http_exc_404_tag_not_found_request(string=slug)
     await tag_crud.delete_tag(session, existing_tag.id)
     return {"message": "Tag deleted successfully"}
 
