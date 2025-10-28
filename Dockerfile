@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # 1. Chỉ copy file chứa dependencies
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml uv.lock ./
 
 # 2. Cài dependencies (layer này sẽ được cache nếu file dependencies không đổi)
 RUN uv sync --frozen --no-cache
