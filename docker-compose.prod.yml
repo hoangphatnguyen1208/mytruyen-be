@@ -30,7 +30,7 @@ services:
             - .env
         depends_on:
             mytruyen-db:
-                condition: service_healthy  
+                condition: service_healthy
         environment:
             DATABASE_HOST: ${POSTGRES_SERVER}
             DATABASE_PORT: ${POSTGRES_PORT}
@@ -42,8 +42,8 @@ services:
             - mytruyen-net
         command: >
             bash -c "
-            alembic upgrade head &&
-            uvicorn app.main:app --host 0.0.0.0 --port 8000
+            uv run alembic upgrade head &&
+            uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
             "
 
 volumes:
