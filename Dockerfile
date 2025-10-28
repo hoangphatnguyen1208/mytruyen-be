@@ -19,16 +19,9 @@ COPY README.md README.md
 RUN python -m pip install --upgrade pip setuptools wheel
 
 # Install runtime dependencies
-RUN pip install \
-    "alembic>=1.16.5" \
-    "asyncpg>=0.30.0" \
-    "bcrypt>=4.3.0" \
-    "fastapi[standard]>=0.116.1" \
-    "passlib>=1.7.4" \
-    "psycopg2-binary>=2.9.10" \
-    "pydantic-settings>=2.10.1" \
-    "pyjwt>=2.10.1" \
-    "sqlmodel>=0.0.25"
+RUN pip install uv \
+    && uv sync
+    
 
 # Production image
 FROM python:3.12-slim
