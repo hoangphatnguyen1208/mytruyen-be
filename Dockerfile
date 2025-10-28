@@ -1,6 +1,12 @@
 # Multi-stage build for a small production image
 FROM python:3.12-slim AS builder
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    libpq-dev \
+    curl \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=ghcr.io/astral-sh/uv:0.9.5 /uv /uvx /bin/
 WORKDIR /app
