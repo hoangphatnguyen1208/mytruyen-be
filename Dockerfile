@@ -1,54 +1,35 @@
 # Multi-stage build for a small production image
 FROM python:3.12-slim AS builder
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gcc \
-    libpq-dev \
-    curl \
-  && rm -rf /var/lib/apt/lists/*
 
+COPY --from=ghcr.io/astral-sh/uv:0.9.5 /uv /uvx /bin/
 WORKDIR /app
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 
-# Copy only dependency spec to leverage Docker cache
-COPY pyproject.toml pyproject.toml
-COPY README.md README.md
+# Dependency installation
+COPY uv.lock pyproject.toml ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --no-install-project --no-dev
 
-# Install pip and wheel
-RUN python -m pip install --upgrade pip setuptools wheel
-
-# Install runtime dependencies
-RUN pip install uv \
-    && uv sync --system
-    
-
+# Project installation
+COPY . .
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
 # Production image
 FROM python:3.12-slim
-LABEL maintainer=""
 
-ENV PYTHONUNBUFFERED=1
-ENV POETRY_VIRTUALENVS_CREATE=false
-ENV PATH="/home/app/.local/bin:$PATH"
-
-# Create app user
-RUN addgroup --system app && adduser --system --ingroup app app
+ENV PATH="/app/.venv/bin:$PATH"
+RUN groupadd -g 1001 app && \
+    useradd -u 1001 -g app -m -d /app -s /bin/false app
 
 WORKDIR /app
 
-# Copy installed packages from builder is not trivial; instead install again (small overhead)
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-
-# Copy project
-COPY . /app
+COPY --from=builder --chown=app:app /app .
 
 # Expose port
 EXPOSE 8000
 
 # Run as non-root
 USER app
-
-
 
 
