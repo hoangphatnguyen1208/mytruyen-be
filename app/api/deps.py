@@ -9,7 +9,7 @@ from app.utilities.exceptions.http.exc_403 import http_exc_403_forbidden_request
 from app.utilities.exceptions.http.exc_404 import http_exc_404_id_not_found_request
 
 from app.core.config import settings
-from app.core.db import async_engine
+from app.core.db import async_session_factory
 from app.core import security
 from app.models import User, user_role as UserRole
 
@@ -18,8 +18,11 @@ from app.crud import user as crud_user
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token")
 
 async def get_db():
-    async with AsyncSession(async_engine) as session:
-        yield session
+    async with async_session_factory() as session:
+        try: 
+            yield session
+        finally:
+            await session.close()
 
 SessionDep: TypeAlias = Annotated[AsyncSession, Depends(get_db)]
 TokenDep: TypeAlias = Annotated[str, Depends(reusable_oauth2)]
@@ -35,7 +38,7 @@ async def get_current_user(session: SessionDep, token: TokenDep):
     id = uuid.UUID(id)
     user = await crud_user.get_user_by_id(session, id)
     if not user:
-        raise http_exc_404_id_not_found_request()
+        raise http_exc_404_id_not_found_request(id=str(id))
     return user
 
 CurrentUser: TypeAlias = Annotated[User, Depends(get_current_user)]
@@ -54,7 +57,11 @@ from arq.connections import RedisSettings
 from arq import create_pool
 
 async def get_redis():
-    async with await create_pool(RedisSettings.from_dsn(settings.REDIS_URL)) as redis:
+    async with await create_pool(RedisSettings(
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        password=settings.REDIS_PASSWORD
+    )) as redis:
         yield redis
 
 RedisDep: TypeAlias = Annotated[any, Depends(get_redis)]

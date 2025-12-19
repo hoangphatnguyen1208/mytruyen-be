@@ -1,5 +1,5 @@
-from sqlmodel import SQLModel
-from pydantic import ConfigDict, Field
+from sqlmodel import SQLModel, Field
+from pydantic import ConfigDict
 from app.schema.user import UserPublic
 from app.schema.genre import GenrePublic
 from app.schema.author import AuthorPublic

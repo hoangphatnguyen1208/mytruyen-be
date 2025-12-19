@@ -1,5 +1,5 @@
 import uuid
-from sqlmodel import select
+from sqlmodel import func, select, insert
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 
@@ -12,6 +12,17 @@ async def create_chapter(session: AsyncSession, chapter_in: ChapterCreate) -> Ch
     await session.commit()
     await session.refresh(chapter)
     return chapter
+
+async def create_chapter_list(session: AsyncSession, chapter_in_list: list[ChapterCreate]):
+    chapters = [Chapter.model_validate(chapter_in) for chapter_in in chapter_in_list]
+    statement = insert(Chapter).values([chapter.model_dump() for chapter in chapters])
+    await session.exec(statement)
+    await session.commit()
+
+async def get_chapter_count(session: AsyncSession) -> int:
+    statement = select(func.count()).select_from(Chapter)
+    result = await session.exec(statement)
+    return result.scalar_one()
 
 async def get_chapters_by_book_id(session: AsyncSession, book_id: uuid.UUID) -> list[Chapter]:
     statement = select(Chapter).where(Chapter.book_id == book_id)
@@ -50,6 +61,11 @@ async def create_chapter_content(session: AsyncSession, content_in: ChapterConte
     await session.commit()
     await session.refresh(content)
     return content
+
+async def get_chapter_content(session: AsyncSession) -> int:
+    statement = select(func.count()).select_from(ChapterContent)
+    result = await session.exec(statement)
+    return result.scalar_one()
 
 async def get_chapter_content_by_chapter_id(session: AsyncSession, chapter_id: uuid.UUID) -> ChapterContent | None:
     statement = select(ChapterContent).where(ChapterContent.chapter_id == chapter_id)

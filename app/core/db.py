@@ -1,5 +1,5 @@
-from sqlalchemy.ext.asyncio import create_async_engine 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.crud import user as crud_user
 from app.models import user_role as UserRole
@@ -8,6 +8,12 @@ from app.core.config import settings
 
 async_engine = create_async_engine(
     settings.POSTGRES_URL
+)
+
+async_session_factory = async_sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False
 )
 
 async def init_db(session: AsyncSession):
@@ -20,3 +26,13 @@ async def init_db(session: AsyncSession):
         )
         await crud_user.create_user(session, admin_in)
         print(f"Created initial admin user with email: {settings.FIRST_ADMIN_EMAIL}")
+
+import redis
+
+r = redis.Redis(
+    host='redis-12984.c295.ap-southeast-1-1.ec2.cloud.redislabs.com',
+    port=12984,
+    decode_responses=True,
+    username="default",
+    password="9nkCo4EywtBxMpqAdnSUn4pMHoY3FvtN",
+)

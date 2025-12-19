@@ -24,7 +24,7 @@ async def create_user(session: AsyncSession, user_create: UserCreate):
     )
     session.add(user)
     await session.commit()
-    session.refresh(user)
+    await session.refresh(user)
     return user
 
 async def get_user_by_id(session: AsyncSession, user_id: uuid.UUID) -> User:

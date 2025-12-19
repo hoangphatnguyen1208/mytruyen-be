@@ -59,13 +59,13 @@ class BookStatus(SQLModel, table=True):
 
 class BookTag(SQLModel, table=True):
     __tablename__ = "book_tag_link"
-    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, primary_key=True)
-    tag_id: int = Field(foreign_key="tag.id", nullable=False, primary_key=True)
+    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, primary_key=True, ondelete="CASCADE")
+    tag_id: int = Field(foreign_key="tag.id", nullable=False, primary_key=True, ondelete="CASCADE")
 
 class BookGenre(SQLModel, table=True):
     __tablename__ = "book_genre_link"
-    genre_id: int = Field(foreign_key="genre.id", nullable=False, primary_key=True)
-    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, primary_key=True)
+    genre_id: int = Field(foreign_key="genre.id", nullable=False, primary_key=True, ondelete="CASCADE")
+    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, primary_key=True, ondelete="CASCADE")
 
 class Tag(SQLModel, table=True):
     __tablename__ = "tag"
@@ -92,8 +92,8 @@ class Genre(SQLModel, table=True):
 class Book(SQLModel, table=True):
     __tablename__ = "book"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    author_id: uuid.UUID | None = Field(default=None, foreign_key="author.id", nullable=True)
-    creator_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
+    author_id: uuid.UUID | None = Field(default=None, foreign_key="author.id", nullable=True, index=True)
+    creator_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True)
     name: str = Field(index=True, nullable=False)
     slug: str = Field(index=True, unique=True, nullable=False)
     kind: int = Field(index=True, nullable=False)
@@ -121,28 +121,30 @@ class Book(SQLModel, table=True):
     status: BookStatus = Relationship(back_populates="books", sa_relationship_kwargs={"lazy": "selectin"})
     author: Author = Relationship(back_populates="books", sa_relationship_kwargs={"lazy": "selectin"})
     creator: User = Relationship(back_populates="books", sa_relationship_kwargs={"lazy": "selectin"})
+    chapters: list["Chapter"] = Relationship(back_populates="book", cascade_delete=True)
     
 class Chapter(SQLModel, table=True):
     __tablename__ = "chapter"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    creator_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
-    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False)
+    creator_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True, ondelete="CASCADE")
+    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, index=True, ondelete="CASCADE")
     name: str = Field(index=True, nullable=False)
     index: int = Field(nullable=False)
     word_count: int = Field(default=0, nullable=False)
     view_count: int = Field(default=0, nullable=False)
     comment_count: int = Field(default=0, nullable=False)
     published: bool = Field(default=False, nullable=False)
-    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    created_at: datetime | None = Field(default=None, sa_column_kwargs={"server_default": func.now()})
+    updated_at: datetime | None = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
     published_at: datetime | None = Field(default=None)
 
-    chapter_content: "ChapterContent" = Relationship(back_populates="chapter")
-    comments: list["Comment"] = Relationship(back_populates="chapter")
+    book: "Book" = Relationship(back_populates="chapters")
+    comments: list["Comment"] = Relationship(back_populates="chapter", cascade_delete=True)
+    chapter_content: "ChapterContent" = Relationship(back_populates="chapter", cascade_delete=True)
 class ChapterContent(SQLModel, table=True):
     __tablename__ = "chapter_content"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    chapter_id: uuid.UUID = Field(foreign_key="chapter.id", nullable=False, unique=True)
+    chapter_id: uuid.UUID = Field(foreign_key="chapter.id", nullable=False, unique=True, ondelete="CASCADE")
     content: str = Field(nullable=False)
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
     updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
@@ -151,8 +153,8 @@ class ChapterContent(SQLModel, table=True):
 class Comment(SQLModel, table=True):
     __tablename__ = "comment"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
-    chapter_id: uuid.UUID = Field(foreign_key="chapter.id", nullable=False)
+    user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True, ondelete="CASCADE")
+    chapter_id: uuid.UUID = Field(foreign_key="chapter.id", nullable=False, index=True, ondelete="CASCADE")
     parent_id: uuid.UUID | None = Field(default=None, foreign_key="comment.id")
     content: str = Field(nullable=False)
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
@@ -164,8 +166,8 @@ class Comment(SQLModel, table=True):
 class Review(SQLModel, table=True):
     __tablename__ = "review"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
-    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False)
+    user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True, ondelete="CASCADE")
+    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, index=True, ondelete="CASCADE")
     rating: int = Field(nullable=False)
     content: str | None = Field(default=None)
     created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})

@@ -9,6 +9,7 @@ from app.core.security import create_access_token
 from app.api.deps import SessionDep
 
 from app.schema.auth import Message, Token, UserLogin, UserRegister
+from app.schema.response import Response
 
 from app.crud import (
     user as user_crud,
@@ -23,36 +24,41 @@ from app.utilities.exceptions.http.exc_400 import (
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login/access-token", response_model=Token)
-async def login_access_token(session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+async def login_access_token(session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     user = await user_crud.authenticate(session, form_data.username, form_data.password)
     if not user:
         raise http_exc_400_credentials_bad_signin_request()
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return Token(
+    token = Token(
         access_token=create_access_token(
             subject=str(user.id), expires_delta=access_token_expires
         ),
         token_type="bearer"
     )
+    return token
 
-@router.post("/login", response_model=Token)
-async def login(session: SessionDep, user_login: UserLogin):
+@router.post("/login", response_model=Response[Token])
+async def login(session: SessionDep, user_login: UserLogin) -> Response[Token]:
     user = await user_crud.authenticate(session, user_login.email, user_login.password)
     if not user:
         raise http_exc_400_credentials_bad_signin_request()
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return Token(
+    token = Token(
         access_token=create_access_token(
             subject=str(user.id), expires_delta=access_token_expires
         ),
         token_type="bearer"
     )
+    return Response(status_code=200, success=True, message="Login successful", data=token)
 
-@router.post("/register", response_model=Message)
-async def register(session: SessionDep, user_register: UserRegister):
+@router.post("/register", response_model=Response[Message])
+async def register(session: SessionDep, user_register: UserRegister) -> Response[Message]:
     existing_user = await user_crud.get_user_by_email(session, user_register.email)
     if existing_user:
         raise http_exc_400_bad_email_request(email=user_register.email)
     user = await user_crud.create_user(session, user_register)
-    return {"message": "User registered successfully"}
+    return Response(status_code=201, success=True, message="User registered successfully", data=Message(message="User registered successfully"))
 
+@router.get("/test", response_model=Response[dict])
+async def test() -> Response[dict]:
+    return Response(status_code=200, success=True, message="Test endpoint", data={"message": "Test endpoint"})

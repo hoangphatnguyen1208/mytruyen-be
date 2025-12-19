@@ -1,5 +1,5 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlmodel import select
+from sqlmodel import func, select
 from sqlalchemy.orm import selectinload
 
 from app.models import Book, Genre
@@ -17,6 +17,11 @@ async def create_book(session: AsyncSession, book_create: BookCreate) -> Book:
     await session.commit()
     await session.refresh(db_book)
     return db_book
+
+async def get_book_count(session: AsyncSession) -> int:
+    statement = select(func.count()).select_from(Book)
+    result = await session.exec(statement)
+    return result.scalar_one()
 
 async def get_books(session: AsyncSession) -> list[Book]:
     statement = select(Book)
