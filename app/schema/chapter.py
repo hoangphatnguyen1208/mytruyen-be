@@ -27,6 +27,7 @@ class ChapterPublic(ChapterBase):
     published_at: datetime | None
     view_count: int
     comment_count: int
+    book_id: uuid.UUID
     created_at: datetime
     updated_at: datetime
 

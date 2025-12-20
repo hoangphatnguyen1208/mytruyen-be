@@ -19,6 +19,10 @@ from app.utilities.exceptions.http.exc_404 import (
 
 router = APIRouter(prefix="/chapters", tags=["chapter"])
 
+@router.get("", response_model=ResponseList[ChapterPublic])
+async def get_all_chapters(session: SessionDep):
+    chapters = await crud_chapter.get_all_chaptters(session)
+    return ResponseList(status_code=200, success=True, message="All chapters retrieved successfully", data=chapters)
 @router.get("/{book_slug}", response_model=ResponseList[ChapterPublic])
 async def get_chapter(session: SessionDep, book_slug: str, index: int | None = None) -> ResponseList[ChapterPublic]:
     existing_book = await crud_book.get_book_by_slug(session, book_slug)

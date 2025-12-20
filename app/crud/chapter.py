@@ -19,6 +19,11 @@ async def create_chapter_list(session: AsyncSession, chapter_in_list: list[Chapt
     await session.exec(statement)
     await session.commit()
 
+async def get_all_chaptters(session: AsyncSession):
+    statement = select(Chapter).order_by(Chapter.book_id.asc(), Chapter.index.asc())
+    result = await session.exec(statement)
+    return result.all()
+
 async def get_chapter_count(session: AsyncSession) -> int:
     statement = select(func.count()).select_from(Chapter)
     result = await session.exec(statement)
