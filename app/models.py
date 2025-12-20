@@ -142,7 +142,7 @@ class Book(SQLModel, table=True):
     bookmark_count: int = Field(default=0, nullable=False)
     poster: dict = Field(sa_column=Column(JSONB))
     note: str = Field(nullable=False)
-    new_chapter_at: datetime | None = Field(
+    new_chap_at: datetime | None = Field(
         sa_column=Column(DateTime(timezone=True), nullable=True),
     )
     created_at: datetime = Field(

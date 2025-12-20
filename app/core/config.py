@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
 
     API_V1_STR: str
+    API_V2_STR: str
     POSTGRES_SERVER: str
     POSTGRES_PORT: int
     POSTGRES_DB: str
