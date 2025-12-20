@@ -41,6 +41,7 @@ class BookPublic(BookBase):
     review_count: int
     average_rating: float
     bookmark_count: int
+    new_chapter_at: datetime | None
     created_at: datetime
     updated_at: datetime
     published_at: datetime | None
