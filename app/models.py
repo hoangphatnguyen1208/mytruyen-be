@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 import uuid
-from sqlalchemy import Column, func, MetaData
-from datetime import datetime
+from sqlalchemy import Column, DateTime, func, MetaData
+from datetime import datetime, timezone
 from enum import Enum
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -31,8 +31,14 @@ class User(SQLModel, table=True):
     is_active: bool = Field(default=True)
     full_name: str | None = Field(default=None)
     role: user_role = Field(default=user_role.USER,nullable=False)
-    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
 
     books: list["Book"] = Relationship(back_populates="creator")
 
@@ -42,8 +48,14 @@ class Author(SQLModel, table=True):
     name: str = Field(index=True, unique=True, nullable=False)
     local_name: str | None = Field(default=None)
     avatar: str | None = Field(default=None)
-    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
 
     books: list["Book"] = Relationship(back_populates="author")
 class BookStatus(SQLModel, table=True):
@@ -52,8 +64,14 @@ class BookStatus(SQLModel, table=True):
     name: str = Field(index=True, unique=True, nullable=False)
     slug: str = Field(index=True, unique=True, nullable=False)
     description: str | None = Field(default=None)
-    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
 
     books: list["Book"] = Relationship(back_populates="status")
 
@@ -74,8 +92,14 @@ class Tag(SQLModel, table=True):
     slug: str = Field(index=True, unique=True, nullable=False)
     type: str = Field(index=True, nullable=False)
     description: str | None = Field(default=None)
-    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
 
     books: list["Book"] = Relationship(back_populates="tags", link_model=BookTag)
 class Genre(SQLModel, table=True):
@@ -84,8 +108,14 @@ class Genre(SQLModel, table=True):
     name: str = Field(index=True, unique=True, nullable=False)
     slug: str = Field(index=True, unique=True, nullable=False)
     description: str | None = Field(default=None)
-    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
 
     books: list["Book"] = Relationship(back_populates="genres", link_model=BookGenre)
 
@@ -112,9 +142,18 @@ class Book(SQLModel, table=True):
     bookmark_count: int = Field(default=0, nullable=False)
     poster: dict = Field(sa_column=Column(JSONB))
     note: str = Field(nullable=False)
-    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
-    published_at: datetime | None = Field(default=None)
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    published_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=True), nullable=True)
+    )
 
     tags: list[Tag] = Relationship(back_populates="books", link_model=BookTag, sa_relationship_kwargs={"lazy": "selectin"})
     genres: list[Genre] = Relationship(back_populates="books", link_model=BookGenre, sa_relationship_kwargs={"lazy": "selectin"})
@@ -134,9 +173,18 @@ class Chapter(SQLModel, table=True):
     view_count: int = Field(default=0, nullable=False)
     comment_count: int = Field(default=0, nullable=False)
     published: bool = Field(default=False, nullable=False)
-    created_at: datetime | None = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime | None = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
-    published_at: datetime | None = Field(default=None)
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    published_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=True), nullable=True)
+    )
 
     book: "Book" = Relationship(back_populates="chapters")
     comments: list["Comment"] = Relationship(back_populates="chapter", cascade_delete=True)
@@ -146,8 +194,14 @@ class ChapterContent(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     chapter_id: uuid.UUID = Field(foreign_key="chapter.id", nullable=False, unique=True, ondelete="CASCADE")
     content: str = Field(nullable=False)
-    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
     
     chapter: "Chapter" = Relationship(back_populates="chapter_content")
 class Comment(SQLModel, table=True):
@@ -157,8 +211,14 @@ class Comment(SQLModel, table=True):
     chapter_id: uuid.UUID = Field(foreign_key="chapter.id", nullable=False, index=True, ondelete="CASCADE")
     parent_id: uuid.UUID | None = Field(default=None, foreign_key="comment.id")
     content: str = Field(nullable=False)
-    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
     
     chapter: "Chapter" = Relationship(back_populates="comments")
     parent: "Comment" = Relationship(back_populates="replies", sa_relationship_kwargs={"remote_side": "Comment.id"})
@@ -170,5 +230,11 @@ class Review(SQLModel, table=True):
     book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, index=True, ondelete="CASCADE")
     rating: int = Field(nullable=False)
     content: str | None = Field(default=None)
-    created_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now()})
-    updated_at: datetime = Field(default=None, sa_column_kwargs={"server_default": func.now(), "onupdate": func.now()})
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(DateTime(timezone=True), nullable=False, onupdate=lambda: datetime.now(timezone.utc)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )

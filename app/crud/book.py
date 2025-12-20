@@ -23,8 +23,25 @@ async def get_book_count(session: AsyncSession) -> int:
     result = await session.exec(statement)
     return result.scalar_one()
 
-async def get_books(session: AsyncSession) -> list[Book]:
+async def get_books(
+    session: AsyncSession,
+    skip: int = 0,
+    limit: int = 10,
+    sort: str | None = None,
+) -> list[Book]:
     statement = select(Book)
+    
+    # Apply sorting
+    if sort:
+        if sort.startswith("-"):
+            sort_field = sort[1:]
+            statement = statement.order_by(getattr(Book, sort_field).desc())
+        else:
+            statement = statement.order_by(getattr(Book, sort).asc())
+    
+    # Apply pagination
+    statement = statement.offset(skip).limit(limit)
+    
     books = await session.exec(statement)
     return books.all()
 

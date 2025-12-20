@@ -22,8 +22,19 @@ async def create_book(session: SessionDep, current_admin: CurrentAdmin, book_reg
     return Response(status_code=201, success=True, message="Book created successfully", data=db_book)
 
 @router.get("", response_model=ResponseList[BookPublic])
-async def get_books(session: SessionDep) -> ResponseList[BookPublic]:
-    db_books = await crud_book.get_books(session)
+async def get_books(
+    session: SessionDep,
+    page: int = 1,
+    limit: int = 10,
+    sort: str | None = None,
+) -> ResponseList[BookPublic]:
+    skip = (page - 1) * limit
+    db_books = await crud_book.get_books(
+        session=session,
+        skip=skip,
+        limit=limit,
+        sort=sort,
+    )
     return ResponseList(status_code=200, success=True, message="Books retrieved successfully", data=db_books)
 
 @router.get("/{slug}", response_model=Response[BookPublic])
