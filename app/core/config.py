@@ -29,4 +29,6 @@ class Settings(BaseSettings):
     REDIS_PORT: int
     REDIS_PASSWORD: str
 
+    PINECONE_API_KEY: str
+
 settings = Settings()

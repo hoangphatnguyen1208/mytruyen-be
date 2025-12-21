@@ -6,11 +6,25 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.schema.response import Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
+import torch
+from FlagEmbedding import BGEM3FlagModel
+from pinecone import Pinecone
+from contextlib import asynccontextmanager
+
+device = torch.device("cpu")
+
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     app.state.search_model = BGEM3FlagModel('BAAI/bge-m3', device='cpu')
+#     app.state.pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+#     app.state.pc_index = app.state.pc.Index("hybrid-spilt")
+#     yield
+#     del app.state.search_model
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
+    # lifespan=lifespan
 )
-
 
 app.add_middleware(
     CORSMiddleware,

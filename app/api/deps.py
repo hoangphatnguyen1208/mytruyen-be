@@ -15,6 +15,9 @@ from app.models import User, user_role as UserRole
 
 from app.crud import user as crud_user
 
+from pinecone import Pinecone
+from FlagEmbedding import BGEM3FlagModel
+
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token")
 
 async def get_db():
@@ -65,3 +68,22 @@ async def get_redis():
         yield redis
 
 RedisDep: TypeAlias = Annotated[any, Depends(get_redis)]
+
+model = BGEM3FlagModel('BAAI/bge-m3', device='cpu')
+pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+pc_index = pc.Index("hybrid-spilt")
+
+async def get_model():
+    return model
+
+ModelDep: TypeAlias = Annotated[BGEM3FlagModel, Depends(get_model)]
+
+async def get_pc_index():
+    return pc_index
+
+PCIndexDep: TypeAlias = Annotated[Pinecone.Index, Depends(get_pc_index)]
+
+async def get_pc():
+    return pc
+
+PCDep: TypeAlias = Annotated[Pinecone, Depends(get_pc)]
