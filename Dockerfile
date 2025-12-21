@@ -1,11 +1,6 @@
 # Stage 1: Builder
 FROM python:3.12-slim AS builder
 
-# Thiết lập biến môi trường cho uv
-ENV UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy \
-    UV_INDEX_URL=https://download.pytorch.org/whl/cpu 
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
@@ -13,19 +8,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
   && rm -rf /var/lib/apt/lists/*
 
-# Copy uv từ image chính thức
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-# 1. Copy file định nghĩa phụ thuộc
+# 1. Chỉ copy file chứa dependencies
 COPY pyproject.toml uv.lock ./
 
-# 2. Cài đặt dependencies (Sử dụng --no-install-project để tách biệt layer thư viện)
-# Flag --extra-index-url giúp ưu tiên bản CPU của Torch
-RUN uv sync --frozen --no-cache --no-dev --extra-index-url https://download.pytorch.org/whl/cpu
+# 2. Cài dependencies (layer này sẽ được cache nếu file dependencies không đổi)
+RUN uv sync --frozen --no-cache
 
-# 3. Copy source code
+# 3. Copy toàn bộ source code
 COPY . .
 
 # Production image
