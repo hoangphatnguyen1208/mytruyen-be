@@ -1,11 +1,13 @@
-from fastapi import APIRouter
-from app.api.deps import PCDep, PCIndexDep, ModelDep
+from fastapi import APIRouter, Request
 from app.schema.response import Response, ResponseList
 
 router = APIRouter(prefix="/search", tags=["search"])
 
 @router.get("", response_model=ResponseList[dict])
-async def search_stories(query_text: str, model: ModelDep, index: PCIndexDep, pc: PCDep):
+async def search_stories(request: Request, query_text: str):
+    model = request.app.state.model
+    index = request.app.state.pc_index
+    pc = request.app.state.pc
     query_output = model.encode(
         query_text,
         return_dense=True,

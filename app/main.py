@@ -13,17 +13,22 @@ from contextlib import asynccontextmanager
 
 device = torch.device("cpu")
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     app.state.search_model = BGEM3FlagModel('BAAI/bge-m3', device='cpu')
-#     app.state.pc = Pinecone(api_key=settings.PINECONE_API_KEY)
-#     app.state.pc_index = app.state.pc.Index("hybrid-spilt")
-#     yield
-#     del app.state.search_model
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.model = BGEM3FlagModel('BAAI/bge-m3', device='cpu')
+    app.state.pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+    app.state.pc_index = app.state.pc.Index("hybrid-spilt")
+    print("✅ Model & Pinecone loaded successfully.")
+
+    yield
+
+    del app.state.model
+    del app.state.pc
+    del app.state.pc_index
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    # lifespan=lifespan
+    lifespan=lifespan
 )
 
 app.add_middleware(
