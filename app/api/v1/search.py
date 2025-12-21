@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from app.api.deps import PCDep, PCIndexDep, ModelDep
-
+from app.schema.response import Response, ResponseList
 
 router = APIRouter(prefix="/search", tags=["search"])
 
-@router.post("")
+@router.get("", response_model=ResponseList[dict])
 async def search_stories(query_text: str, model: ModelDep, index: PCIndexDep, pc: PCDep):
     query_output = model.encode(
         query_text,
@@ -61,5 +61,10 @@ async def search_stories(query_text: str, model: ModelDep, index: PCIndexDep, pc
             }
         })
 
-    return {"results": final_output}
+    return Response(
+        status_code=200,
+        success=True,
+        message="Search completed successfully",
+        data=final_output
+    )
 

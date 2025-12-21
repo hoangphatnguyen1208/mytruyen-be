@@ -69,7 +69,10 @@ async def get_redis():
 
 RedisDep: TypeAlias = Annotated[any, Depends(get_redis)]
 
-model = BGEM3FlagModel('BAAI/bge-m3', device='cpu')
+model = BGEM3FlagModel(
+    "./models/bge-m3",
+    device="cpu"
+)
 pc = Pinecone(api_key=settings.PINECONE_API_KEY)
 pc_index = pc.Index("hybrid-spilt")
 
