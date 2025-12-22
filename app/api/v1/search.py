@@ -5,14 +5,17 @@ router = APIRouter(prefix="/search", tags=["search"])
 
 @router.get("", response_model=ResponseList[dict])
 async def search_stories(request: Request, query_text: str):
+    print("Search query received:", query_text)
     model = request.app.state.model
     index = request.app.state.pc_index
     pc = request.app.state.pc
+    print("Model and index accessed from app state.")
     query_output = model.encode(
         query_text,
         return_dense=True,
         return_sparse=True,
     )
+    print("Query encoded.")
 
     dense_vector = query_output['dense_vecs'].tolist()
     sparse_dict = query_output['lexical_weights']
@@ -20,7 +23,7 @@ async def search_stories(request: Request, query_text: str):
         "indices": [int(k) for k in sparse_dict.keys()],
         "values": [float(v) for v in sparse_dict.values()]
     }
-
+    print("Dense and sparse vectors prepared.")
     results = index.query(
         namespace="mytruyen",
         vector=dense_vector,
@@ -28,6 +31,7 @@ async def search_stories(request: Request, query_text: str):
         top_k=30,
         include_metadata=True
     )
+    print("Initial search query executed.")
 
     documents = [
         {
@@ -41,6 +45,7 @@ async def search_stories(request: Request, query_text: str):
         } 
         for match in results["matches"]
     ]
+    print(f"Retrieved {len(documents)} documents from initial search.")
 
     rerank_results = pc.inference.rerank(
         model="bge-reranker-v2-m3", 
@@ -50,6 +55,7 @@ async def search_stories(request: Request, query_text: str):
         return_documents=True,
         rank_fields=["text"]
     )
+    print("Reranking completed.")
 
     final_output = []
     for hit in rerank_results.data:
@@ -64,6 +70,7 @@ async def search_stories(request: Request, query_text: str):
                 "chapter_index": doc.get("chapter_index")
             }
         })
+    print(f"Final output prepared with {len(final_output)} results.")
 
     return Response(
         status_code=200,
