@@ -35,7 +35,9 @@ async def search_stories(request: Request, query_text: str):
         "text": match["metadata"]["text"], 
         "chapter_id": match["metadata"]["chapter_id"],
         "book_id": match["metadata"]["book_id"],
-        "chapter_index": match["metadata"]["index"]
+        "chapter_index": match["metadata"]["index"],
+        "book_name": match["metadata"]["book_name"],    
+        "chapter_name": match["metadata"]["chapter_name"]
         } 
         for match in results["matches"]
     ]
