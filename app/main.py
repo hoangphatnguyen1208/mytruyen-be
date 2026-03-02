@@ -9,26 +9,31 @@ from starlette.middleware.cors import CORSMiddleware
 import torch
 from FlagEmbedding import BGEM3FlagModel
 from pinecone import Pinecone
+from faster_whisper import WhisperModel
 from contextlib import asynccontextmanager
+import logging
 
 device = torch.device("cpu")
+logger = logging.getLogger("uvicorn")
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    app.state.model = BGEM3FlagModel('BAAI/bge-m3', device='cpu')
-    app.state.pc = Pinecone(api_key=settings.PINECONE_API_KEY)
-    app.state.pc_index = app.state.pc.Index("hybrid-spilt")
-    print("✅ Model & Pinecone loaded successfully.")
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     logger.info("⏳ Loading models & Pinecone...")
+#     app.state.model = BGEM3FlagModel('BAAI/bge-m3', device='cpu')
+#     app.state.whisper_model = WhisperModel('turbo', device='cpu', compute_type='int8')
+#     app.state.pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+#     app.state.pc_index = app.state.pc.Index("hybrid-spilt")
+#     logger.info("✅ Models & Pinecone loaded successfully.")
+#     yield
 
-    yield
-
-    del app.state.model
-    del app.state.pc
-    del app.state.pc_index
+#     del app.state.model
+#     del app.state.whisper_model
+#     del app.state.pc
+#     del app.state.pc_index
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    lifespan=lifespan
+    # lifespan=lifespan
 )
 
 app.add_middleware(

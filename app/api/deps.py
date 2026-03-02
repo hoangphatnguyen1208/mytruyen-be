@@ -15,9 +15,6 @@ from app.models import User, user_role as UserRole
 
 from app.crud import user as crud_user
 
-from pinecone import Pinecone
-from FlagEmbedding import BGEM3FlagModel
-
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login/access-token")
 
 async def get_db():
