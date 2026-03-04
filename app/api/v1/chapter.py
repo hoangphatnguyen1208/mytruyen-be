@@ -25,7 +25,7 @@ async def get_all_chapters(session: SessionDep):
     return ResponseList(status_code=200, success=True, message="All chapters retrieved successfully", data=chapters)
 
 @router.get("/id/{book_id}", response_model=ResponseList[ChapterPublic])
-async def get_chapter(session: SessionDep, book_id: uuid.UUID, index: int | None = None) -> ResponseList[ChapterPublic]:
+async def get_chapter(session: SessionDep, book_id: int, index: int | None = None) -> ResponseList[ChapterPublic]:
     existing_book = await crud_book.get_book_by_id(session, book_id)
     if not existing_book:
         raise http_exc_404_book_not_found_request(string=f"{book_id}")
@@ -38,7 +38,7 @@ async def get_chapter(session: SessionDep, book_id: uuid.UUID, index: int | None
     return ResponseList(status_code=200, success=True, message="Chapters retrieved successfully", data=chapters)
 
 @router.post("/id/{book_id}", response_model=Response[ChapterPublic], status_code=status.HTTP_201_CREATED)
-async def create_chapter(session: SessionDep, book_id: uuid.UUID, chapter_data: ChapterRegister, current_admin: CurrentAdmin) -> Response[ChapterPublic]:
+async def create_chapter(session: SessionDep, book_id: int, chapter_data: ChapterRegister, current_admin: CurrentAdmin) -> Response[ChapterPublic]:
     existing_book = await crud_book.get_book_by_id(session, book_id)
     if not existing_book:
         raise http_exc_404_book_not_found_request(string=f"{book_id}")
@@ -52,7 +52,7 @@ async def create_chapter(session: SessionDep, book_id: uuid.UUID, chapter_data: 
     return Response(status_code=201, success=True, message="Chapter created successfully", data=chapter)
 
 @router.patch("/id/{chapter_id}", response_model=Response[ChapterPublic])
-async def update_chapter(session: SessionDep, chapter_id: uuid.UUID, chapter_data: ChapterUpdate) -> Response[ChapterPublic]:
+async def update_chapter(session: SessionDep, chapter_id: int, chapter_data: ChapterUpdate) -> Response[ChapterPublic]:
     existing_chapter = await crud_chapter.get_chapter_by_id(session, chapter_id)
     if not existing_chapter:
         raise http_exc_404_chapter_not_found_request(string=f"{chapter_id}")
@@ -60,7 +60,7 @@ async def update_chapter(session: SessionDep, chapter_id: uuid.UUID, chapter_dat
     return Response(status_code=200, success=True, message="Chapter updated successfully", data=updated_chapter)
 
 @router.get("/content/id/{book_id}/{index}", response_model=Response[ChapterContentPublic])
-async def get_chapter_content(session: SessionDep, book_id: uuid.UUID, index: int) -> Response[ChapterContentPublic]:
+async def get_chapter_content(session: SessionDep, book_id: int, index: int) -> Response[ChapterContentPublic]:
     book = await crud_book.get_book_by_id(session, book_id)
     if not book:
         raise http_exc_404_book_not_found_request(string=f"{book_id}")
@@ -73,7 +73,7 @@ async def get_chapter_content(session: SessionDep, book_id: uuid.UUID, index: in
     return Response(status_code=200, success=True, message="Chapter content retrieved successfully", data=chapter_content)
 
 @router.post("/content/id/{book_id}/{index}", response_model=Response[ChapterContentPublic], status_code=status.HTTP_201_CREATED)
-async def create_chapter_content(session: SessionDep, book_id: uuid.UUID, index: int, chapter_content_data: ChapterContentRegister, current_admin: CurrentAdmin) -> Response[ChapterContentPublic]:
+async def create_chapter_content(session: SessionDep, book_id: int, index: int, chapter_content_data: ChapterContentRegister, current_admin: CurrentAdmin) -> Response[ChapterContentPublic]:
     book = await crud_book.get_book_by_id(session, book_id)
     if not book:
         raise http_exc_404_book_not_found_request(string=f"{book_id}")
@@ -91,7 +91,7 @@ async def create_chapter_content(session: SessionDep, book_id: uuid.UUID, index:
     return Response(status_code=201, success=True, message="Chapter content created successfully", data=chapter_content)
 
 @router.patch("/content/id/{book_id}/{index}", response_model=Response[ChapterContentPublic])
-async def update_chapter_content(session: SessionDep, book_id: uuid.UUID, index: int, chapter_content_data: ChapterContentUpdate, current_admin: CurrentAdmin) -> Response[ChapterContentPublic]:
+async def update_chapter_content(session: SessionDep, book_id: int, index: int, chapter_content_data: ChapterContentUpdate, current_admin: CurrentAdmin) -> Response[ChapterContentPublic]:
     book = await crud_book.get_book_by_id(session, book_id)
     if not book:
         raise http_exc_404_book_not_found_request(string=f"{book_id}")

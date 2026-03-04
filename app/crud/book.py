@@ -45,7 +45,7 @@ async def get_books(
     books = await session.exec(statement)
     return books.all()
 
-async def get_book_by_id(session: AsyncSession, book_id: str) -> Book | None:
+async def get_book_by_id(session: AsyncSession, book_id: int) -> Book | None:
     book = await session.exec(select(Book).where(Book.id == book_id))
     return book.first()
 
@@ -54,7 +54,7 @@ async def get_book_by_slug(session: AsyncSession, slug: str) -> Book | None:
     books = await session.exec(statement)
     return books.first()
 
-async def update_book(session: AsyncSession, book_id: str, book: BookUpdate) -> Book:
+async def update_book(session: AsyncSession, book_id: int, book: BookUpdate) -> Book:
     book_data = book.model_dump()
     book_data = {k: v for k, v in book_data.items() if k in book.model_fields_set}
     current_book = await get_book_by_id(session, book_id)
@@ -67,7 +67,7 @@ async def update_book(session: AsyncSession, book_id: str, book: BookUpdate) -> 
     await session.refresh(current_book)
     return current_book
 
-async def delete_book(session: AsyncSession, book_id: str) -> bool:
+async def delete_book(session: AsyncSession, book_id: int) -> bool:
     book = await get_book_by_id(session, book_id)
     await session.delete(book)
     await session.commit()

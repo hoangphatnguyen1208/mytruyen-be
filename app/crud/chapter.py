@@ -29,22 +29,22 @@ async def get_chapter_count(session: AsyncSession) -> int:
     result = await session.exec(statement)
     return result.scalar_one()
 
-async def get_chapters_by_book_id(session: AsyncSession, book_id: uuid.UUID) -> list[Chapter]:
+async def get_chapters_by_book_id(session: AsyncSession, book_id: int) -> list[Chapter]:
     statement = select(Chapter).where(Chapter.book_id == book_id).order_by(Chapter.index.asc())
     result = await session.exec(statement)
     return result.all()
 
-async def get_chapter_by_book_id_and_chapter_index(session: AsyncSession, book_id: uuid.UUID, chapter_index: int) -> Chapter | None:
+async def get_chapter_by_book_id_and_chapter_index(session: AsyncSession, book_id: int, chapter_index: int) -> Chapter | None:
     statement = select(Chapter).where(Chapter.book_id == book_id, Chapter.index == chapter_index)
     result = await session.exec(statement)
     return result.first()
 
-async def get_chapter_by_id(session: AsyncSession, chapter_id: uuid.UUID) -> Chapter | None:
+async def get_chapter_by_id(session: AsyncSession, chapter_id: int) -> Chapter | None:
     statement = select(Chapter).where(Chapter.id == chapter_id)
     result = await session.exec(statement)
     return result.first()
 
-async def update_chapter(session: AsyncSession, chapter_id: uuid.UUID, chapter_in: ChapterCreate) -> Chapter:
+async def update_chapter(session: AsyncSession, chapter_id: int, chapter_in: ChapterCreate) -> Chapter:
     chapter_data = chapter_in.model_dump()
     chapter_data = {k: v for k, v in chapter_data.items() if k in chapter_in.model_fields_set}
     chapter = await get_chapter_by_id(session, chapter_id)
@@ -54,7 +54,7 @@ async def update_chapter(session: AsyncSession, chapter_id: uuid.UUID, chapter_i
     await session.refresh(chapter)
     return chapter
 
-async def delete_chapter(session: AsyncSession, chapter_id: uuid.UUID) -> bool:
+async def delete_chapter(session: AsyncSession, chapter_id: int) -> bool:
     chapter = await get_chapter_by_id(session, chapter_id)
     await session.delete(chapter)
     await session.commit()
@@ -72,12 +72,12 @@ async def get_chapter_content(session: AsyncSession) -> int:
     result = await session.exec(statement)
     return result.scalar_one()
 
-async def get_chapter_content_by_chapter_id(session: AsyncSession, chapter_id: uuid.UUID) -> ChapterContent | None:
+async def get_chapter_content_by_chapter_id(session: AsyncSession, chapter_id: int) -> ChapterContent | None:
     statement = select(ChapterContent).where(ChapterContent.chapter_id == chapter_id)
     result = await session.exec(statement)
     return result.first()
 
-async def update_chapter_content(session: AsyncSession, chapter_id: uuid.UUID, content_in: ChapterContentCreate) -> ChapterContent:
+async def update_chapter_content(session: AsyncSession, chapter_id: int, content_in: ChapterContentCreate) -> ChapterContent:
     content_data = content_in.model_dump()
     content_data = {k: v for k, v in content_data.items() if k in content_in.model_fields_set}
     content = await get_chapter_content_by_chapter_id(session, chapter_id)

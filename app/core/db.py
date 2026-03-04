@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.crud import user as crud_user
@@ -17,6 +18,8 @@ async_session_factory = async_sessionmaker(
 )
 
 async def init_db(session: AsyncSession):
+    # async with async_engine.begin() as conn:
+    #     await conn.run_sync(SQLModel.metadata.create_all)
     existing = await crud_user.get_user_by_email(session, settings.FIRST_ADMIN_EMAIL)
     if not existing:
         admin_in = UserCreate(

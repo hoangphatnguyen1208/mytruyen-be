@@ -12,11 +12,11 @@ class ChapterRegister(ChapterBase):
     pass
 
 class ChapterCreate(ChapterBase):
-    book_id: uuid.UUID
+    book_id: int
     creator_id: uuid.UUID
 
 class ChapterUpdate(ChapterBase):
-    book_id: uuid.UUID | None = None
+    book_id: int | None = None
     index: int | None = None
     name: str | None = None
     published: bool | None = None
@@ -27,7 +27,7 @@ class ChapterPublic(ChapterBase):
     published_at: datetime | None
     view_count: int
     comment_count: int
-    book_id: uuid.UUID
+    book_id: int
     created_at: datetime
     updated_at: datetime
 
@@ -35,13 +35,13 @@ class ChapterContentBase(SQLModel):
     content: str
 
 class ChapterContentCreate(ChapterContentBase):
-    chapter_id: uuid.UUID
+    chapter_id: int
 class ChapterContentRegister(ChapterContentBase):
     pass
 
 class ChapterContentUpdate(ChapterContentBase):
     content: str | None = None
-    chapter_id: uuid.UUID | None = None
+    chapter_id: int | None = None
 
 class ChapterContentPublic(ChapterContentBase):
     id: uuid.UUID

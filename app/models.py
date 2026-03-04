@@ -77,13 +77,13 @@ class BookStatus(SQLModel, table=True):
 
 class BookTag(SQLModel, table=True):
     __tablename__ = "book_tag_link"
-    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, primary_key=True, ondelete="CASCADE")
+    book_id: int = Field(foreign_key="book.id", nullable=False, primary_key=True, ondelete="CASCADE")
     tag_id: int = Field(foreign_key="tag.id", nullable=False, primary_key=True, ondelete="CASCADE")
 
 class BookGenre(SQLModel, table=True):
     __tablename__ = "book_genre_link"
     genre_id: int = Field(foreign_key="genre.id", nullable=False, primary_key=True, ondelete="CASCADE")
-    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, primary_key=True, ondelete="CASCADE")
+    book_id: int = Field(foreign_key="book.id", nullable=False, primary_key=True, ondelete="CASCADE")
 
 class Tag(SQLModel, table=True):
     __tablename__ = "tag"
@@ -171,7 +171,7 @@ class Chapter(SQLModel, table=True):
     __tablename__ = "chapter"
     id: int | None = Field(default=None, primary_key=True)
     creator_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True, ondelete="CASCADE")
-    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, index=True, ondelete="CASCADE")
+    book_id: int = Field(foreign_key="book.id", nullable=False, index=True, ondelete="CASCADE")
     name: str = Field(index=True, nullable=False)
     index: int = Field(nullable=False)
     word_count: int = Field(default=0, nullable=False)
@@ -197,7 +197,7 @@ class Chapter(SQLModel, table=True):
 class ChapterContent(SQLModel, table=True):
     __tablename__ = "chapter_content"
     id: int | None = Field(default=None, primary_key=True)
-    chapter_id: uuid.UUID = Field(foreign_key="chapter.id", nullable=False, unique=True, ondelete="CASCADE")
+    chapter_id: int = Field(foreign_key="chapter.id", nullable=False, unique=True, ondelete="CASCADE")
     content: str = Field(nullable=False)
     created_at: datetime = Field(
         sa_column=Column(DateTime(timezone=True), nullable=False),
@@ -213,7 +213,7 @@ class Comment(SQLModel, table=True):
     __tablename__ = "comment"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True, ondelete="CASCADE")
-    chapter_id: uuid.UUID = Field(foreign_key="chapter.id", nullable=False, index=True, ondelete="CASCADE")
+    chapter_id: int = Field(foreign_key="chapter.id", nullable=False, index=True, ondelete="CASCADE")
     parent_id: uuid.UUID | None = Field(default=None, foreign_key="comment.id")
     content: str = Field(nullable=False)
     created_at: datetime = Field(
@@ -232,7 +232,7 @@ class Review(SQLModel, table=True):
     __tablename__ = "review"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True, ondelete="CASCADE")
-    book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, index=True, ondelete="CASCADE")
+    book_id: int = Field(foreign_key="book.id", nullable=False, index=True, ondelete="CASCADE")
     rating: int = Field(nullable=False)
     content: str | None = Field(default=None)
     created_at: datetime = Field(
