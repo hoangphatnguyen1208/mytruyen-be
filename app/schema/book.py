@@ -22,7 +22,7 @@ class BookBase(SQLModel):
     word_count: int = 0
     
 class BookRegister(BookBase):
-    id: uuid.UUID | None = None
+    id: int | None = None
     author_id: uuid.UUID | None = None
     genre_ids: list[int]
     tag_ids: list[int]
@@ -33,7 +33,7 @@ class BookCreate(BookBase):
     genre_ids: list[int]
 
 class BookPublic(BookBase):
-    id: uuid.UUID
+    id: int
     latest_chapter: str | None
     view_count: int
     chapter_count: int
