@@ -121,7 +121,7 @@ class Genre(SQLModel, table=True):
 
 class Book(SQLModel, table=True):
     __tablename__ = "book"
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     author_id: uuid.UUID | None = Field(default=None, foreign_key="author.id", nullable=True, index=True)
     creator_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True)
     name: str = Field(index=True, nullable=False)
@@ -169,7 +169,7 @@ class Book(SQLModel, table=True):
     
 class Chapter(SQLModel, table=True):
     __tablename__ = "chapter"
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     creator_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True, ondelete="CASCADE")
     book_id: uuid.UUID = Field(foreign_key="book.id", nullable=False, index=True, ondelete="CASCADE")
     name: str = Field(index=True, nullable=False)
@@ -196,7 +196,7 @@ class Chapter(SQLModel, table=True):
     chapter_content: "ChapterContent" = Relationship(back_populates="chapter", cascade_delete=True)
 class ChapterContent(SQLModel, table=True):
     __tablename__ = "chapter_content"
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     chapter_id: uuid.UUID = Field(foreign_key="chapter.id", nullable=False, unique=True, ondelete="CASCADE")
     content: str = Field(nullable=False)
     created_at: datetime = Field(

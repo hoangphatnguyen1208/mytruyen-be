@@ -1,20 +1,19 @@
 from fastapi import FastAPI
 from app.api.main import api_router
-from app.api.mainv2 import api_router as api_router_v2
 from app.core.config import settings
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.schema.response import Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
-import torch
-from FlagEmbedding import BGEM3FlagModel
-from pinecone import Pinecone
-from faster_whisper import WhisperModel
-from contextlib import asynccontextmanager
+# import torch
+# from FlagEmbedding import BGEM3FlagModel
+# from pinecone import Pinecone
+# from faster_whisper import WhisperModel
+# from contextlib import asynccontextmanager
 import logging
 
-device = torch.device("cpu")
-logger = logging.getLogger("uvicorn")
+# device = torch.device("cpu")
+# logger = logging.getLogger("uvicorn")
 
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
@@ -57,4 +56,3 @@ async def http_exception_handler(request, exc):
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
-app.include_router(api_router_v2, prefix=settings.API_V2_STR)

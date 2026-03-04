@@ -37,14 +37,41 @@ async def get_books(
     )
     return ResponseList(status_code=200, success=True, message="Books retrieved successfully", data=db_books)
 
-@router.get("/{slug}", response_model=Response[BookPublic])
+@router.get("/id/{book_id}", response_model=Response[BookPublic])
+async def get_book_by_id(book_id: str, session: SessionDep):
+    db_book = await crud_book.get_book_by_id(session, book_id)
+    if not db_book:
+        raise http_exc_404_book_not_found_request(string=book_id)
+    return Response(status_code=200, success=True, message="Book retrieved successfully", data=db_book)
+
+@router.patch("/id/{book_id}", response_model=Response[BookPublic])
+async def update_book(book_id: str, session: SessionDep, current_admin: CurrentAdmin, book: BookUpdate):
+    db_book = await crud_book.get_book_by_id(session, book_id)
+    if not db_book:
+        raise http_exc_404_book_not_found_request(string=book_id)
+    if db_book.author_id != current_admin.id:
+        raise http_exc_403_forbidden_request()
+    updated_book = await crud_book.update_book(session, db_book.id, book)
+    return Response(status_code=200, success=True, message="Book updated successfully", data=updated_book)
+
+@router.delete("/id/{book_id}", response_model=Response[None])
+async def delete_book(book_id: str, session: SessionDep, current_admin: CurrentAdmin):
+    db_book = await crud_book.get_book_by_id(session, book_id)
+    if not db_book:
+        raise http_exc_404_book_not_found_request(string=book_id)
+    if db_book.author_id != current_admin.id:
+        raise http_exc_403_forbidden_request()
+    await crud_book.delete_book(session, db_book.id)
+    return Response(status_code=200, success=True, message="Book deleted successfully", data=None)
+
+@router.get("/slug/{slug}", response_model=Response[BookPublic])
 async def get_book_by_slug(slug: str, session: SessionDep):
     db_book = await crud_book.get_book_by_slug(session, slug)
     if not db_book:
         raise http_exc_404_book_not_found_request(string=slug)
     return Response(status_code=200, success=True, message="Book retrieved successfully", data=db_book)
 
-@router.patch("/{slug}", response_model=Response[BookPublic])
+@router.patch("/slug/{slug}", response_model=Response[BookPublic])
 async def update_book(slug: str, session: SessionDep, current_admin: CurrentAdmin, book: BookUpdate):
     db_book = await crud_book.get_book_by_slug(session, slug)
     if not db_book:
@@ -54,7 +81,7 @@ async def update_book(slug: str, session: SessionDep, current_admin: CurrentAdmi
     updated_book = await crud_book.update_book(session, db_book.id, book)
     return Response(status_code=200, success=True, message="Book updated successfully", data=updated_book)
 
-@router.delete("/{slug}", response_model=Response[None])
+@router.delete("/slug/{slug}", response_model=Response[None])
 async def delete_book(slug: str, session: SessionDep, current_admin: CurrentAdmin):
     db_book = await crud_book.get_book_by_slug(session, slug)
     if not db_book:
