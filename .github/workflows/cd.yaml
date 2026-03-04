@@ -21,4 +21,4 @@ jobs:
             cd mytruyen-be
             docker pull hoangphat120805/mytruyen-be:latest
             docker compose up -d mytruyen-be
-            docker system prune -f
+            docker image prune -f
