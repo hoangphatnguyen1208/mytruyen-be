@@ -9,9 +9,10 @@ class ChapterBase(SQLModel):
     published: bool
 
 class ChapterRegister(ChapterBase):
-    pass
+    id: int | None = None
 
 class ChapterCreate(ChapterBase):
+    id: int | None = None
     book_id: int
     creator_id: uuid.UUID
 

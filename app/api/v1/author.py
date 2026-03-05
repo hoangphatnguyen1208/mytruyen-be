@@ -21,8 +21,9 @@ async def create_author(session: SessionDep, current_admin: CurrentAdmin, author
     return Response(status_code=201, success=True, message="Author created successfully", data=db_author)
 
 @router.get("", response_model=ResponseList[AuthorPublic])
-async def get_authors(session: SessionDep) -> ResponseList[AuthorPublic]:
-    authors = await crud_author.get_authors(session)
+async def get_authors(session: SessionDep, page: int = 1, limit: int = 10) -> ResponseList[AuthorPublic]:
+    skip = (page - 1) * limit
+    authors = await crud_author.get_authors(session, skip=skip, limit=limit)
     return ResponseList(status_code=200, success=True, message="Authors retrieved successfully", data=authors)
 
 @router.get("/{name}", response_model=Response[AuthorPublic])

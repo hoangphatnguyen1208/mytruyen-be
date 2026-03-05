@@ -12,8 +12,8 @@ async def create_author(session: AsyncSession, author_create: AuthorCreate) -> A
     await session.refresh(db_author)
     return db_author
 
-async def get_authors(session: AsyncSession) -> list[Author]:
-    statement = select(Author)
+async def get_authors(session: AsyncSession, skip: int = 0, limit: int = 10) -> list[Author]:
+    statement = select(Author).offset(skip).limit(limit)
     authors = await session.exec(statement)
     return authors.all()
 
