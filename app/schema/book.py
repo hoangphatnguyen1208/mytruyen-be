@@ -28,6 +28,7 @@ class BookRegister(BookBase):
     tag_ids: list[int]
 
 class BookCreate(BookBase):
+    id: int | None = None
     author_id: uuid.UUID | None = None
     creator_id: uuid.UUID
     genre_ids: list[int]
