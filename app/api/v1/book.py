@@ -34,18 +34,20 @@ async def create_book(session: SessionDep, current_admin: CurrentAdmin, book_reg
     author = await crud_author.get_author_by_id(session, book_register.author_id)
     if not author:
         raise http_exc_404_author_not_found_request(string=book_register.author_id)
-    # check if the tag does not exist
-    tag = await crud_tag.get_tag_by_id(session, book_register.tag_id)
-    if not tag:
-        raise http_exc_404_tag_not_found_request(string=book_register.tag_id)
+    # check if the tags do not exist
+    for tag_id in book_register.tag_ids:
+        tag = await crud_tag.get_tag_by_id(session, tag_id)
+        if not tag:
+            raise http_exc_404_tag_not_found_request(string=tag_id)
     # check if the book_status doen not exist
-    book_status = await crud_book_status.get_book_status_by_id(session, book_register.book_status_id)
+    book_status = await crud_book_status.get_book_status_by_id(session, book_register.status_id)
     if not book_status:
-        raise http_exc_404_status_not_found_request(string=book_register.book_status_id)
-    # check if the genre does not exist
-    genre = await crud_genre.get_genre_by_id(session, book_register.genre_id)
-    if not genre:
-        raise http_exc_404_genre_not_found(genre_id=book_register.genre_id)
+        raise http_exc_404_status_not_found_request(string=book_register.status_id)
+    # check if the genres do not exist
+    for genre_id in book_register.genre_ids:
+        genre = await crud_genre.get_genre_by_id(session, genre_id)
+        if not genre:
+            raise http_exc_404_genre_not_found(genre_id=genre_id)
     book_in = BookCreate.model_validate(book_register, update={"creator_id": str(current_admin.id)})
     db_book = await crud_book.create_book(session, book_in)
     return Response(status_code=201, success=True, message="Book created successfully", data=db_book)
