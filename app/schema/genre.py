@@ -1,5 +1,4 @@
 from sqlmodel import SQLModel, Field
-import uuid
 from datetime import datetime
 
 class GenreBase(SQLModel):

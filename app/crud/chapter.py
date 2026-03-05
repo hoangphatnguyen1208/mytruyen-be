@@ -1,4 +1,3 @@
-import uuid
 from sqlmodel import func, select, insert
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -87,7 +86,7 @@ async def update_chapter_content(session: AsyncSession, chapter_id: int, content
     await session.refresh(content)
     return content
 
-async def delete_chapter_content(session: AsyncSession, content_id: uuid.UUID) -> bool:
+async def delete_chapter_content(session: AsyncSession, content_id: int) -> bool:
     content = await get_chapter_content_by_chapter_id(session, content_id)
     await session.delete(content)
     await session.commit()

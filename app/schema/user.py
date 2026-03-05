@@ -21,3 +21,6 @@ class UserCreate(SQLModel):
 
 class UserPublic(UserBase):
     pass
+
+class UserUpdate(SQLModel):
+    full_name: str | None = None

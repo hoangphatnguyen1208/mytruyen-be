@@ -61,8 +61,8 @@ class BookUpdate(SQLModel):
     published: bool | None = None
     synopsis: str | None = None
     note: str | None = None
-    genre_ids: list[uuid.UUID] | None = None
-    tag_ids: list[uuid.UUID] | None = None
+    genre_ids: list[int] | None = None
+    tag_ids: list[int] | None = None
     poster: dict | None = None
     chapter_count: int | None = None
     view_count: int | None = None

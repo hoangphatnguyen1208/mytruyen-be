@@ -1,4 +1,3 @@
-import uuid
 from fastapi import APIRouter, status
 
 from app.crud import chapter as crud_chapter, book as crud_book

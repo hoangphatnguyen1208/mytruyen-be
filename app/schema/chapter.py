@@ -23,7 +23,7 @@ class ChapterUpdate(ChapterBase):
     word_count: int | None = None
 
 class ChapterPublic(ChapterBase):
-    id: uuid.UUID
+    id: int
     published_at: datetime | None
     view_count: int
     comment_count: int
@@ -44,6 +44,6 @@ class ChapterContentUpdate(ChapterContentBase):
     chapter_id: int | None = None
 
 class ChapterContentPublic(ChapterContentBase):
-    id: uuid.UUID
+    id: int
     created_at: datetime
     updated_at: datetime
