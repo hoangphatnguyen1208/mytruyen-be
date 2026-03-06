@@ -1,12 +1,15 @@
 from sqlmodel import func, select, insert
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-
-from app.models import Chapter, ChapterContent
+from app.models import Chapter, ChapterContent, Book
 from app.schema.chapter import ChapterContentCreate, ChapterCreate
+
+from datetime import datetime
 
 async def create_chapter(session: AsyncSession, chapter_in: ChapterCreate) -> Chapter:
     chapter = Chapter.model_validate(chapter_in)
+    book = await session.get(Book, chapter_in.book_id)
+    book.new_chap_at = datetime.now()
     session.add(chapter)
     await session.commit()
     await session.refresh(chapter)
