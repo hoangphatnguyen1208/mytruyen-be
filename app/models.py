@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 import uuid
-from sqlalchemy import Column, DateTime, func, MetaData
+from sqlalchemy import Column, DateTime, func, MetaData, Index, UniqueConstraint
 from datetime import datetime, timezone
 from enum import Enum
 from sqlalchemy.dialects.postgresql import JSONB
@@ -169,6 +169,12 @@ class Book(SQLModel, table=True):
     
 class Chapter(SQLModel, table=True):
     __tablename__ = "chapter"
+
+    __table_args__ = (
+        Index("idx_chapter_book_index", "book_id", "index"),  # composite index
+        UniqueConstraint("book_id", "index", name="uq_chapter_book_index"),  # unique constraint
+    )
+
     id: int | None = Field(default=None, primary_key=True)
     creator_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, index=True, ondelete="CASCADE")
     book_id: int = Field(foreign_key="book.id", nullable=False, index=True, ondelete="CASCADE")

@@ -1,4 +1,4 @@
-from sqlmodel import func, select, insert
+from sqlmodel import func, select, insert, update
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.models import Chapter, ChapterContent, Book
@@ -6,14 +6,21 @@ from app.schema.chapter import ChapterContentCreate, ChapterCreate
 
 from datetime import datetime
 
-async def create_chapter(session: AsyncSession, chapter_in: ChapterCreate) -> Chapter:
+async def create_chapter(session: AsyncSession, chapter_in: ChapterCreate) -> bool:
     chapter = Chapter.model_validate(chapter_in)
-    book = await session.get(Book, chapter_in.book_id)
-    book.new_chap_at = datetime.now()
+
     session.add(chapter)
+
+    await session.exec(
+        update(Book)
+        .where(Book.id == chapter.book_id)
+        .values(new_chap_at=func.now())
+    )
+
     await session.commit()
     await session.refresh(chapter)
-    return chapter
+
+    return True
 
 async def create_chapter_list(session: AsyncSession, chapter_in_list: list[ChapterCreate]):
     chapters = [Chapter.model_validate(chapter_in) for chapter_in in chapter_in_list]

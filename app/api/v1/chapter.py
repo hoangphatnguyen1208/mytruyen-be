@@ -36,8 +36,8 @@ async def get_chapter(session: SessionDep, book_id: int, index: int | None = Non
     chapters = await crud_chapter.get_chapters_by_book_id(session, existing_book.id)
     return ResponseList(status_code=200, success=True, message="Chapters retrieved successfully", data=chapters)
 
-@router.post("/id/{book_id}", response_model=Response[ChapterPublic], status_code=status.HTTP_201_CREATED)
-async def create_chapter(session: SessionDep, book_id: int, chapter_data: ChapterRegister, current_admin: CurrentAdmin) -> Response[ChapterPublic]:
+@router.post("/id/{book_id}", response_model=Response[None], status_code=status.HTTP_201_CREATED)
+async def create_chapter(session: SessionDep, book_id: int, chapter_data: ChapterRegister, current_admin: CurrentAdmin) -> Response[None]:
     existing_book = await crud_book.get_book_by_id(session, book_id)
     if not existing_book:
         raise http_exc_404_book_not_found_request(string=f"{book_id}")
@@ -48,7 +48,7 @@ async def create_chapter(session: SessionDep, book_id: int, chapter_data: Chapte
         raise http_exc_400_chapter_bad_request(slug=chapter_data.index)
     chapter_in = ChapterCreate.model_validate(chapter_data, update={"book_id": existing_book.id, "creator_id": str(current_admin.id)})
     chapter = await crud_chapter.create_chapter(session, chapter_in)
-    return Response(status_code=201, success=True, message="Chapter created successfully", data=chapter)
+    return Response(status_code=201, success=True, message="Chapter created successfully", data=None)
 
 @router.patch("/id/{chapter_id}", response_model=Response[ChapterPublic])
 async def update_chapter(session: SessionDep, chapter_id: int, chapter_data: ChapterUpdate) -> Response[ChapterPublic]:
@@ -114,8 +114,8 @@ async def get_chapter(session: SessionDep, book_slug: str, index: int | None = N
     chapters = await crud_chapter.get_chapters_by_book_id(session, existing_book.id)
     return ResponseList(status_code=200, success=True, message="Chapters retrieved successfully", data=chapters)
 
-@router.post("/slug/{book_slug}", response_model=Response[ChapterPublic], status_code=status.HTTP_201_CREATED)
-async def create_chapter(session: SessionDep, book_slug: str, chapter_data: ChapterRegister, current_admin: CurrentAdmin) -> Response[ChapterPublic]:
+@router.post("/slug/{book_slug}", response_model=Response[None], status_code=status.HTTP_201_CREATED)
+async def create_chapter(session: SessionDep, book_slug: str, chapter_data: ChapterRegister, current_admin: CurrentAdmin) -> Response[None]:
     existing_book = await crud_book.get_book_by_slug(session, book_slug)
     if not existing_book:
         raise http_exc_404_book_not_found_request(string=f"{book_slug}")
@@ -125,8 +125,8 @@ async def create_chapter(session: SessionDep, book_slug: str, chapter_data: Chap
     if existing_chapter:
         raise http_exc_400_chapter_bad_request(slug=chapter_data.index)
     chapter_in = ChapterCreate.model_validate(chapter_data, update={"book_id": existing_book.id, "creator_id": str(current_admin.id)})
-    chapter = await crud_chapter.create_chapter(session, chapter_in)
-    return Response(status_code=201, success=True, message="Chapter created successfully", data=chapter)
+    await crud_chapter.create_chapter(session, chapter_in)
+    return Response(status_code=201, success=True, message="Chapter created successfully", data=None)
 
 @router.get("/content/slug/{book_slug}/{index}", response_model=Response[ChapterContentPublic])
 async def get_chapter_content(session: SessionDep, book_slug: str, index: int) -> Response[ChapterContentPublic]:
