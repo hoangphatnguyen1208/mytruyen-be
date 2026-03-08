@@ -18,8 +18,7 @@ async def create_chapter(session: AsyncSession, chapter_in: ChapterCreate) -> bo
     )
 
     await session.commit()
-    await session.refresh(chapter)
-
+    
     return True
 
 async def create_chapter_list(session: AsyncSession, chapter_in_list: list[ChapterCreate]):

@@ -19,7 +19,10 @@ reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/log
 
 async def get_db():
     async with async_session_factory() as session:
-        yield session
+        try:
+            yield session
+        finally:
+            await session.rollback()
 
 SessionDep: TypeAlias = Annotated[AsyncSession, Depends(get_db)]
 TokenDep: TypeAlias = Annotated[str, Depends(reusable_oauth2)]
