@@ -21,7 +21,6 @@ from app.utilities.exceptions.http.exc_404 import (
     http_exc_404_status_not_found_request, 
     http_exc_404_tag_not_found_request
 )
-from app.utilities.exceptions.http.exc_403 import http_exc_403_forbidden_request
 
 router = APIRouter(prefix="/books", tags=["book"])
 
@@ -80,8 +79,6 @@ async def update_book(book_id: int, session: SessionDep, current_admin: CurrentA
     db_book = await crud_book.get_book_by_id(session, book_id)
     if not db_book:
         raise http_exc_404_book_not_found_request(string=book_id)
-    if db_book.author_id != current_admin.id:
-        raise http_exc_403_forbidden_request()
     updated_book = await crud_book.update_book(session, db_book.id, book)
     return Response(status_code=200, success=True, message="Book updated successfully", data=updated_book)
 
@@ -90,8 +87,6 @@ async def delete_book(book_id: int, session: SessionDep, current_admin: CurrentA
     db_book = await crud_book.get_book_by_id(session, book_id)
     if not db_book:
         raise http_exc_404_book_not_found_request(string=book_id)
-    if db_book.author_id != current_admin.id:
-        raise http_exc_403_forbidden_request()
     await crud_book.delete_book(session, db_book.id)
     return Response(status_code=200, success=True, message="Book deleted successfully", data=None)
 
@@ -107,8 +102,6 @@ async def update_book(slug: str, session: SessionDep, current_admin: CurrentAdmi
     db_book = await crud_book.get_book_by_slug(session, slug)
     if not db_book:
         raise http_exc_404_book_not_found_request(string=slug)
-    if db_book.author_id != current_admin.id:
-        raise http_exc_403_forbidden_request()
     updated_book = await crud_book.update_book(session, db_book.id, book)
     return Response(status_code=200, success=True, message="Book updated successfully", data=updated_book)
 
@@ -117,8 +110,6 @@ async def delete_book(slug: str, session: SessionDep, current_admin: CurrentAdmi
     db_book = await crud_book.get_book_by_slug(session, slug)
     if not db_book:
         raise http_exc_404_book_not_found_request(string=slug)
-    if db_book.author_id != current_admin.id:
-        raise http_exc_403_forbidden_request()
     await crud_book.delete_book(session, db_book.id)
     return Response(status_code=200, success=True, message="Book deleted successfully", data=None)
 

@@ -50,8 +50,16 @@ async def create_chapter(session: SessionDep, book_id: int, chapter_data: Chapte
     chapter = await crud_chapter.create_chapter(session, chapter_in)
     return Response(status_code=201, success=True, message="Chapter created successfully", data=None)
 
+@router.delete("/id/{chapter_id}", response_model=Response[None])
+async def delete_chapter(session: SessionDep, chapter_id: int, current_admin: CurrentAdmin) -> Response[None]:
+    existing_chapter = await crud_chapter.get_chapter_by_id(session, chapter_id)
+    if not existing_chapter:
+        raise http_exc_404_chapter_not_found_request(string=f"{chapter_id}")
+    await crud_chapter.delete_chapter(session, chapter_id)
+    return Response(status_code=200, success=True, message="Chapter deleted successfully", data=None)
+
 @router.patch("/id/{chapter_id}", response_model=Response[ChapterPublic])
-async def update_chapter(session: SessionDep, chapter_id: int, chapter_data: ChapterUpdate) -> Response[ChapterPublic]:
+async def update_chapter(session: SessionDep, chapter_id: int, chapter_data: ChapterUpdate, current_admin: CurrentAdmin) -> Response[ChapterPublic]:
     existing_chapter = await crud_chapter.get_chapter_by_id(session, chapter_id)
     if not existing_chapter:
         raise http_exc_404_chapter_not_found_request(string=f"{chapter_id}")
@@ -114,6 +122,14 @@ async def get_chapter(session: SessionDep, book_slug: str, index: int | None = N
     chapters = await crud_chapter.get_chapters_by_book_id(session, existing_book.id)
     return ResponseList(status_code=200, success=True, message="Chapters retrieved successfully", data=chapters)
 
+@router.delete("/slug/{chapter_id}", response_model=Response[None])
+async def delete_chapter(session: SessionDep, chapter_id: int, current_admin: CurrentAdmin) -> Response[None]:
+    existing_chapter = await crud_chapter.get_chapter_by_id(session, chapter_id)
+    if not existing_chapter:
+        raise http_exc_404_chapter_not_found_request(string=f"{chapter_id}")
+    await crud_chapter.delete_chapter(session, chapter_id)
+    return Response(status_code=200, success=True, message="Chapter deleted successfully", data=None)
+
 @router.post("/slug/{book_slug}", response_model=Response[None], status_code=status.HTTP_201_CREATED)
 async def create_chapter(session: SessionDep, book_slug: str, chapter_data: ChapterRegister, current_admin: CurrentAdmin) -> Response[None]:
     existing_book = await crud_book.get_book_by_slug(session, book_slug)
@@ -170,4 +186,18 @@ async def update_chapter_content(session: SessionDep, book_slug: str, index: int
     chapter_content_in = ChapterContentUpdate.model_validate(chapter_content_data)
     updated_content = await crud_chapter.update_chapter_content(session, chapter.id, chapter_content_in)
     return Response(status_code=200, success=True, message="Chapter content updated successfully", data=updated_content)
+
+@router.delete("/content/slug/{book_slug}/{index}", response_model=Response[None])
+async def delete_chapter_content(session: SessionDep, book_slug: str, index: int, current_admin: CurrentAdmin) -> Response[None]:
+    book = await crud_book.get_book_by_slug(session, book_slug)
+    if not book:
+        raise http_exc_404_book_not_found_request(string=f"{book_slug}")
+    chapter = await crud_chapter.get_chapter_by_book_id_and_chapter_index(session, book.id, index)
+    if not chapter:
+        raise http_exc_404_chapter_not_found_request(string=f"{chapter.id}")
+    chapter_content = await crud_chapter.get_chapter_content_by_chapter_id(session, chapter.id)
+    if not chapter_content:
+        raise http_exc_404_chapter_content_not_found_request(string=f"{chapter.id}")
+    await crud_chapter.delete_chapter_content(session, chapter_content.id)
+    return Response(status_code=200, success=True, message="Chapter content deleted successfully", data=None)
 
