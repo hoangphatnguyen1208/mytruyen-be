@@ -8,13 +8,14 @@ from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def create_access_token(subject: Optional[str], expires_delta: timedelta) -> str:
+def create_access_token(data: dict, expires_delta: timedelta) -> str:
     expires = datetime.now(timezone.utc) + expires_delta
-    to_encode = {"exp": expires, "sub": subject} 
+    to_encode = data.copy()
+    to_encode.update({"exp": expires})
     encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
     return encoded_jwt
 
-def decode_token(token: str) -> Optional[str]:
+def decode_token(token: str) -> dict:
     """Decode JWT token và trả về subject (user_id)"""
     try:
         payload = jwt.decode(
@@ -22,7 +23,7 @@ def decode_token(token: str) -> Optional[str]:
             settings.JWT_SECRET_KEY, 
             algorithms=[settings.JWT_ALGORITHM]
         )
-        return payload.get("sub")
+        return payload
     except jwt.ExpiredSignatureError:
         return None
     except (jwt.PyJWTError, jwt.DecodeError):

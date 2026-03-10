@@ -30,7 +30,7 @@ TokenDep: TypeAlias = Annotated[str, Depends(reusable_oauth2)]
 async def get_current_user(session: SessionDep, token: TokenDep):
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-        id = payload.get("sub")
+        id = payload.get("id")
     except jwt.PyJWTError:
         raise http_exc_403_forbidden_request()
     if not id:

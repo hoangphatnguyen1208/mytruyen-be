@@ -48,15 +48,15 @@ class TestSecurity:
             settings.JWT_SECRET_KEY,
             algorithms=[settings.JWT_ALGORITHM]
         )
-        assert payload["sub"] == subject
+        assert payload["id"] == subject
 
     @pytest.mark.asyncio
     async def test_create_access_token_with_expiration(self):
         """Test tạo token với thời gian expiry tùy chỉnh"""
-        subject = "user123"
+        id = "user123"
         expires_delta = timedelta(minutes=30)
         token = create_access_token(
-            subject=subject,
+            data={"id": id},
             expires_delta=expires_delta
         )
         
@@ -68,18 +68,18 @@ class TestSecurity:
             settings.JWT_SECRET_KEY,
             algorithms=[settings.JWT_ALGORITHM]
         )
-        assert payload["sub"] == subject
+        assert payload["id"] == id
         assert "exp" in payload
 
     @pytest.mark.asyncio
     async def test_decode_token_valid(self):
         """Test decode token hợp lệ"""
-        subject = "user123"
+        id = "user123"
         expires_delta = timedelta(minutes=15)
-        token = create_access_token(subject=subject, expires_delta=expires_delta)
+        token = create_access_token(data={"id": id}, expires_delta=expires_delta)
         
-        decoded_subject = decode_token(token)
-        assert decoded_subject == subject
+        decoded_id = decode_token(token)
+        assert decoded_id == id
 
     @pytest.mark.asyncio
     async def test_decode_token_invalid(self):
