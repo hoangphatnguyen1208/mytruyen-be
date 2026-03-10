@@ -1,14 +1,11 @@
 def http_400_username_details(username: str) -> str:
     return f"The username {username} is taken! Be creative and choose another one!"
 
-
 def http_400_email_details(email: str) -> str:
     return f"The email {email} is already registered! Be creative and choose another one!"
 
-
 def http_400_signup_credentials_details() -> str:
     return "Signup failed! Recheck all your credentials!"
-
 
 def http_400_sigin_credentials_details() -> str:
     return "Signin failed! Recheck all your credentials!"

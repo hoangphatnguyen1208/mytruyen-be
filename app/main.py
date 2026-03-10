@@ -10,7 +10,7 @@ from starlette.middleware.cors import CORSMiddleware
 # from pinecone import Pinecone
 # from faster_whisper import WhisperModel
 # from contextlib import asynccontextmanager
-import logging
+# import logging
 
 # device = torch.device("cpu")
 # logger = logging.getLogger("uvicorn")

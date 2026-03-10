@@ -91,3 +91,9 @@ def http_exc_400_status_bad_request(string: str):
         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
         detail=http_400_status_details(string=string),
     )   
+
+def http_exc_400_user_bad_request(string: str):
+    raise HTTPException(
+        status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+        detail=http_400_email_details(email=string),
+    )
