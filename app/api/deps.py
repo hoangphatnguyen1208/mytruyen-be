@@ -4,6 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated, TypeAlias
 from sqlmodel.ext.asyncio.session import AsyncSession
 import uuid
+from httpx import AsyncClient
 
 from app.utilities.exceptions.http.exc_403 import http_exc_403_forbidden_request
 from app.utilities.exceptions.http.exc_404 import http_exc_404_id_not_found_request
@@ -65,3 +66,9 @@ async def get_redis():
         yield redis
 
 RedisDep: TypeAlias = Annotated[any, Depends(get_redis)]
+
+async def get_client():
+    async with AsyncClient() as client:
+        yield client
+
+ClientDep: TypeAlias = Annotated[AsyncClient, Depends(get_client)]

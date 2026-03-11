@@ -1,5 +1,5 @@
-from fastapi import APIRouter, status
-from app.api.deps import SessionDep, CurrentAdmin
+from fastapi import APIRouter, status, Depends
+from app.api.deps import SessionDep, CurrentAdmin, ClientDep
 
 from app.crud import (
     book as crud_book, 
@@ -21,7 +21,6 @@ from app.utilities.exceptions.http.exc_404 import (
     http_exc_404_status_not_found_request, 
     http_exc_404_tag_not_found_request
 )
-
 router = APIRouter(prefix="/books", tags=["book"])
 
 @router.post("", response_model=Response[BookPublic], status_code=status.HTTP_201_CREATED)
@@ -113,5 +112,7 @@ async def delete_book(slug: str, session: SessionDep, current_admin: CurrentAdmi
     await crud_book.delete_book(session, db_book.id)
     return Response(status_code=200, success=True, message="Book deleted successfully", data=None)
 
-
-
+@router.get("/topboxes")
+async def get_top_boxes(client: ClientDep, session: SessionDep, kind: int, limit: int):
+    res = await client.get(f"https://backend.metruyencv.com/api/topboxes?filter%5Btopboxable.kind%5D={kind}&limit={limit}") 
+    return res.json()
