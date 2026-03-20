@@ -4,12 +4,10 @@ from app.schema.book import BookPublic
 from typing import Any, TypeVar, Generic
 
 class Pagination(SQLModel):
-    current: int
-    next: int | None = None
-    previous: int | None = None
-    last: int
-    limit: int
-    total: int
+    page: int
+    size: int
+    total_items: int
+    total_pages: int
 
 T = TypeVar("T")
 

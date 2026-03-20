@@ -31,7 +31,12 @@ async def login_access_token(session: SessionDep, form_data: Annotated[OAuth2Pas
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     token = Token(
         access_token=create_access_token(
-            subject=str(user.id), expires_delta=access_token_expires
+            data = {
+                "id": str(user.id),
+                "email": user.email,
+                "role": user.role.value
+            }, 
+            expires_delta=access_token_expires
         ),
         token_type="bearer"
     )
