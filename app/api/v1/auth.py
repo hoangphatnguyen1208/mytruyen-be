@@ -51,7 +51,7 @@ async def login(session: SessionDep, login_data: Login) -> Response[Token]:
     if not user:
         raise http_exc_400_credentials_bad_signin_request()
     refresh_token = create_refresh_token()
-    refresh_token_expires_at = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS) + datetime.utcnow() 
+    refresh_token_expires_at = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS) + datetime.now() 
     await auth_service.save_refresh_token(session, str(user.id), refresh_token, expires_at= refresh_token_expires_at)
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     token = Token(
