@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     POSTGRES_SYNC_URL: str
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int 
+    REFRESH_TOKEN_EXPIRE_DAYS: int
     JWT_SECRET_KEY: str 
     JWT_ALGORITHM: str
 

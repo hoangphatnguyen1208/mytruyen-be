@@ -10,10 +10,6 @@ class UserBase(SQLModel):
     full_name: str | None = None
     is_active: bool = True
 
-class UserRegister(SQLModel):
-    email: str
-    password: str
-
 class UserCreate(SQLModel):
     email: str
     password: str

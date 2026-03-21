@@ -1,3 +1,4 @@
+import uuid
 import jwt
 from passlib.context import CryptContext
 
@@ -35,3 +36,5 @@ def get_password_hash(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
+def create_refresh_token() -> str:
+    return str(uuid.uuid4())

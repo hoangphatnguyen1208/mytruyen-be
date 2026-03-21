@@ -9,15 +9,6 @@ from app.schema.user import UserCreate
 
 from app.core.security import get_password_hash, verify_password
 
-async def authenticate(session: AsyncSession, email: str, password: str) -> User:
-    users = await session.exec(select(User).where(User.email == email))
-    user_db = users.first()
-    if not user_db:
-        return None
-    if not verify_password(password, user_db.hashed_password):
-        return None
-    return user_db
-
 async def create_user(session: AsyncSession, user_create: UserCreate):
     user = User.model_validate(
         user_create, update={"hashed_password": get_password_hash(user_create.password)}

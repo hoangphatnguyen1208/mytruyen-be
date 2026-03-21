@@ -1,16 +1,23 @@
+from datetime import datetime
+
 from sqlmodel import SQLModel
 
 class Token(SQLModel):
     access_token: str
+    refresh_token: str = None
     token_type: str
 
-class UserLogin(SQLModel):
+
+class Login(SQLModel):
     email: str
     password: str
 
-class UserRegister(SQLModel):
+class Register(SQLModel):
     email: str
     password: str
 
 class Message(SQLModel):
     message: str
+
+class RefreshTokenRequest(SQLModel):
+    refresh_token: str
