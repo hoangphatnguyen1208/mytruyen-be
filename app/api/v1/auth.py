@@ -80,9 +80,9 @@ async def register(session: SessionDep, register_data: Register) -> Response[Mes
     user = await user_crud.create_user(session, user_create)
     return Response(status_code=201, success=True, message="User registered successfully", data=Message(message="User registered successfully"))
 
-@router.get("/test", response_model=Response[dict])
-async def test() -> Response[dict]:
-    return Response(status_code=200, success=True, message="Test endpoint", data={"message": "Test endpoint"})
+@router.get("/health", response_model=Response[None])
+async def health() -> Response[None]:
+    return Response(status_code=200, success=True, message="Server is running", data=None)
 
 @router.post("/refresh-token", response_model=Response[Token])
 async def refresh_token(session: SessionDep, refresh_data: RefreshTokenRequest) -> Response[Token]:
