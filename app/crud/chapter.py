@@ -3,6 +3,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.models import Chapter, ChapterContent, Book
 from app.schema.chapter import ChapterContentCreate, ChapterCreate
+from app.schema.response import Pagination  
 
 from datetime import datetime
 
@@ -27,22 +28,27 @@ async def create_chapter_list(session: AsyncSession, chapter_in_list: list[Chapt
     await session.exec(statement)
     await session.commit()
 
-async def get_all_chaptters(session: AsyncSession):
-    statement = select(Chapter).order_by(Chapter.book_id.asc(), Chapter.index.asc())
+async def get_all_chaptters(session: AsyncSession, limit: int, skip: int) -> list[Chapter]:
+    statement = select(Chapter).order_by(Chapter.book_id.asc(), Chapter.index.asc()).offset(skip).limit(limit)
     result = await session.exec(statement)
     return result.all()
 
 async def get_chapter_count(session: AsyncSession) -> int:
     statement = select(func.count()).select_from(Chapter)
     result = await session.exec(statement)
-    return result.scalar_one()
+    return result.first()
+
+async def get_chapter_count_by_book_id(session: AsyncSession, book_id: int) -> int:
+    statement = select(func.count()).select_from(Chapter).where(Chapter.book_id == book_id)
+    result = await session.exec(statement)
+    return result.first()
 
 async def get_chapters_by_book_id(session: AsyncSession, book_id: int, limit: int, skip: int) -> list[Chapter]:
-    statement = select(Chapter).where(Chapter.book_id == book_id).order_by(Chapter.index.asc()).offset(skip).limit(limit)
-    result = await session.exec(statement)
+    stmt = select(Chapter).where(Chapter.book_id == book_id).order_by(Chapter.index.asc()).offset(skip).limit(limit)
+    result = await session.exec(stmt)
     return result.all()
 
-async def get_chapter_by_book_id_and_chapter_index(session: AsyncSession, book_id: int, chapter_index: int) -> Chapter | None:
+async def get_chapter_by_book_id_and_index(session: AsyncSession, book_id: int, chapter_index: int) -> Chapter | None:
     statement = select(Chapter).where(Chapter.book_id == book_id, Chapter.index == chapter_index)
     result = await session.exec(statement)
     return result.first()

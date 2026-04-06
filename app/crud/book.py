@@ -21,7 +21,7 @@ async def create_book(session: AsyncSession, book_create: BookCreate) -> Book:
 async def get_book_count(session: AsyncSession) -> int:
     statement = select(func.count()).select_from(Book)
     result = await session.exec(statement)
-    return result.scalar_one()
+    return result.first()
 
 async def get_books(
     session: AsyncSession,
