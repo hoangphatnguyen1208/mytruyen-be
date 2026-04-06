@@ -17,9 +17,9 @@ from app.utilities.exceptions.http.exc_404 import (
     http_exc_404_book_not_found_request
 )
 
-async def get_all_chapters(session: AsyncSession, limit: int, page: int) -> tuple[list[Chapter], Pagination]:
+async def get_all_chapters(session: AsyncSession, limit: int, page: int, sort: str | None = None) -> tuple[list[Chapter], Pagination]:
     skip = (page - 1) * limit if page > 0 else 0
-    chapters = await crud_chapter.get_all_chaptters(session, limit, skip)
+    chapters = await crud_chapter.get_all_chaptters(session, limit, skip, sort)
     total_items = await crud_chapter.get_chapter_count(session)
     pagination = Pagination(
         page=page,
@@ -29,12 +29,12 @@ async def get_all_chapters(session: AsyncSession, limit: int, page: int) -> tupl
     )
     return chapters, pagination
 
-async def get_chapters_by_book_id(session: AsyncSession, book_id: int, limit: int, page: int) -> tuple[list[Chapter], Pagination]:
+async def get_chapters_by_book_id(session: AsyncSession, book_id: int, limit: int, page: int, sort: str | None = None) -> tuple[list[Chapter], Pagination]:
     existing_book = await crud_book.get_book_by_id(session, book_id)
     if not existing_book:
         raise http_exc_404_book_not_found_request(string=f"{book_id}")
     skip = (page - 1) * limit if page > 0 else 0
-    chapters = await crud_chapter.get_chapters_by_book_id(session, book_id, limit, skip)
+    chapters = await crud_chapter.get_chapters_by_book_id(session, book_id, limit, skip, sort)
     total_items = await crud_chapter.get_chapter_count_by_book_id(session, book_id)
     pagination = Pagination(
         page=page,
@@ -44,12 +44,12 @@ async def get_chapters_by_book_id(session: AsyncSession, book_id: int, limit: in
     )
     return chapters, pagination
 
-async def get_chapters_by_book_slug(session: AsyncSession, book_slug: str, limit: int, page: int) -> tuple[list[Chapter], Pagination]:
+async def get_chapters_by_book_slug(session: AsyncSession, book_slug: str, limit: int, page: int, sort: str | None = None) -> tuple[list[Chapter], Pagination]:
     existing_book = await crud_book.get_book_by_slug(session, book_slug)
     if not existing_book:
         raise http_exc_404_book_not_found_request(string=f"{book_slug}")
     skip = (page - 1) * limit if page > 0 else 0
-    chapters = await crud_chapter.get_chapters_by_book_id(session, existing_book.id, limit, skip)
+    chapters = await crud_chapter.get_chapters_by_book_id(session, existing_book.id, limit, skip, sort)
     total_items = await crud_chapter.get_chapter_count_by_book_id(session, existing_book.id)
     pagination = Pagination(
         page=page,

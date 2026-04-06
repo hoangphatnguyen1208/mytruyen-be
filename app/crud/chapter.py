@@ -28,8 +28,17 @@ async def create_chapter_list(session: AsyncSession, chapter_in_list: list[Chapt
     await session.exec(statement)
     await session.commit()
 
-async def get_all_chaptters(session: AsyncSession, limit: int, skip: int) -> list[Chapter]:
-    statement = select(Chapter).order_by(Chapter.book_id.asc(), Chapter.index.asc()).offset(skip).limit(limit)
+async def get_all_chaptters(session: AsyncSession, limit: int, skip: int, sort: str | None = None) -> list[Chapter]:
+    statement = select(Chapter)
+    if sort:
+        if sort.startswith("-"):
+            sort_field = sort[1:]
+            statement = statement.order_by(getattr(Chapter, sort_field).desc())
+        else:
+            statement = statement.order_by(getattr(Chapter, sort).asc())
+    else:
+        statement = statement.order_by(Chapter.book_id.asc(), Chapter.index.asc())
+    statement = statement.offset(skip).limit(limit)
     result = await session.exec(statement)
     return result.all()
 
@@ -43,8 +52,17 @@ async def get_chapter_count_by_book_id(session: AsyncSession, book_id: int) -> i
     result = await session.exec(statement)
     return result.first()
 
-async def get_chapters_by_book_id(session: AsyncSession, book_id: int, limit: int, skip: int) -> list[Chapter]:
-    stmt = select(Chapter).where(Chapter.book_id == book_id).order_by(Chapter.index.asc()).offset(skip).limit(limit)
+async def get_chapters_by_book_id(session: AsyncSession, book_id: int, limit: int, skip: int, sort: str | None = None) -> list[Chapter]:
+    stmt = select(Chapter).where(Chapter.book_id == book_id)
+    if sort:
+        if sort.startswith("-"):
+            sort_field = sort[1:]
+            stmt = stmt.order_by(getattr(Chapter, sort_field).desc())
+        else:
+            stmt = stmt.order_by(getattr(Chapter, sort).asc())
+    else:
+        stmt = stmt.order_by(Chapter.index.asc())
+    stmt = stmt.offset(skip).limit(limit)
     result = await session.exec(stmt)
     return result.all()
 

@@ -10,8 +10,8 @@ from app.service import chapter as service_chapter
 router = APIRouter(prefix="/chapters", tags=["chapter"])
 
 @router.get("", response_model=ResponsePage[ChapterPublic])
-async def get_all_chapters(session: SessionDep, limit: int = 10, page: int = 1):
-    chapters, pagination = await service_chapter.get_all_chapters(session, limit, page)
+async def get_all_chapters(session: SessionDep, limit: int = 10, page: int = 1, sort: str | None = None):
+    chapters, pagination = await service_chapter.get_all_chapters(session, limit, page, sort)
     return ResponsePage(status_code=200, success=True, message="All chapters retrieved successfully", data=chapters, pagination=pagination)
 
 @router.get("/id/{book_id}", response_model=ResponsePage[ChapterPublic])
@@ -19,9 +19,10 @@ async def get_chapter(
         session: SessionDep, 
         book_id: int, 
         limit: int = 30,
-        page: int = 1
+        page: int = 1,
+        sort: str | None = None,
     ) -> ResponsePage[ChapterPublic]:
-    chapters, pagination = await service_chapter.get_chapters_by_book_id(session, book_id, limit, page)
+    chapters, pagination = await service_chapter.get_chapters_by_book_id(session, book_id, limit, page, sort)
     return ResponsePage(
         status_code=200, 
         success=True, 
@@ -67,8 +68,8 @@ async def update_chapter_content(session: SessionDep, book_id: int, index: int, 
     return Response(status_code=200, success=True, message="Chapter content updated successfully", data=updated_content)
 
 @router.get("/slug/{book_slug}", response_model=ResponsePage[ChapterPublic])
-async def get_chapter_by_slug(session: SessionDep, book_slug: str, limit: int = 10, page: int = 1):
-    chapters, pagination = await service_chapter.get_chapters_by_book_slug(session, book_slug, limit, page)
+async def get_chapter_by_slug(session: SessionDep, book_slug: str, limit: int = 10, page: int = 1, sort: str | None = None):
+    chapters, pagination = await service_chapter.get_chapters_by_book_slug(session, book_slug, limit, page, sort)
     return ResponsePage(
         status_code=200, 
         success=True, 
