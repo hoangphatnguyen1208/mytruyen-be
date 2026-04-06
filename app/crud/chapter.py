@@ -37,8 +37,8 @@ async def get_chapter_count(session: AsyncSession) -> int:
     result = await session.exec(statement)
     return result.scalar_one()
 
-async def get_chapters_by_book_id(session: AsyncSession, book_id: int) -> list[Chapter]:
-    statement = select(Chapter).where(Chapter.book_id == book_id).order_by(Chapter.index.asc())
+async def get_chapters_by_book_id(session: AsyncSession, book_id: int, limit: int, skip: int) -> list[Chapter]:
+    statement = select(Chapter).where(Chapter.book_id == book_id).order_by(Chapter.index.asc()).offset(skip).limit(limit)
     result = await session.exec(statement)
     return result.all()
 

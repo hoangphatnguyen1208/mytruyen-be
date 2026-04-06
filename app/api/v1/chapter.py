@@ -4,7 +4,7 @@ from app.crud import chapter as crud_chapter, book as crud_book
 from app.schema.chapter import ChapterCreate, ChapterRegister, ChapterPublic, ChapterUpdate
 from app.schema.chapter import ChapterContentCreate, ChapterContentRegister, ChapterContentPublic, ChapterContentUpdate
 from app.api.deps import CurrentAdmin, SessionDep
-from app.schema.response import Response, ResponseList
+from app.schema.response import Response, ResponseList, ResponsePage
 
 from app.utilities.exceptions.http.exc_400 import (
     http_exc_400_chapter_bad_request,
@@ -24,17 +24,28 @@ async def get_all_chapters(session: SessionDep):
     return ResponseList(status_code=200, success=True, message="All chapters retrieved successfully", data=chapters)
 
 @router.get("/id/{book_id}", response_model=ResponseList[ChapterPublic])
-async def get_chapter(session: SessionDep, book_id: int, index: int | None = None) -> ResponseList[ChapterPublic]:
+async def get_chapter(
+        session: SessionDep, 
+        book_id: int, 
+        limit: int = 30,
+        page: int = 1
+    ) -> ResponsePage[ChapterPublic]:
     existing_book = await crud_book.get_book_by_id(session, book_id)
     if not existing_book:
         raise http_exc_404_book_not_found_request(string=f"{book_id}")
-    if index is not None:
-        chapter = await crud_chapter.get_chapter_by_book_id_and_chapter_index(session, existing_book.id, index)
-        if not chapter:
-            raise http_exc_404_chapter_not_found_request(string=f"{index}")
-        return ResponseList(status_code=200, success=True, message="Chapter retrieved successfully", data=[chapter])
-    chapters = await crud_chapter.get_chapters_by_book_id(session, existing_book.id)
+    skip = limit * (page - 1)
+    chapters = await crud_chapter.get_chapters_by_book_id(session, existing_book.id, limit, skip)
     return ResponseList(status_code=200, success=True, message="Chapters retrieved successfully", data=chapters)
+
+@router.get("/id/{book_id}/index/{index}", response_model=Response[ChapterPublic])
+async def get_chapter_by_index(session: SessionDep, book_id: int, index: int): 
+    existing_book = await crud_book.get_book_by_id(session, book_id)
+    if not existing_book:
+        raise http_exc_404_book_not_found_request(string=f"{book_id}")
+    chapter = await crud_chapter.get_chapter_by_book_id_and_chapter_index(session, existing_book.id, index)
+    if not chapter:
+        raise http_exc_404_chapter_not_found_request(string=f"{index}")
+    return Response(status_code=200, success=True, message="Chapter retrieved successfully", data=chapter)
 
 @router.post("/id/{book_id}", response_model=Response[None], status_code=status.HTTP_201_CREATED)
 async def create_chapter(session: SessionDep, book_id: int, chapter_data: ChapterRegister, current_admin: CurrentAdmin) -> Response[None]:

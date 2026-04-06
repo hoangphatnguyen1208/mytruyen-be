@@ -23,3 +23,6 @@ class Response(BaseModel, Generic[T]):
     message: str
     data: T | None = None
 
+class ResponsePage(ResponseList):
+    pagination: Pagination
+
