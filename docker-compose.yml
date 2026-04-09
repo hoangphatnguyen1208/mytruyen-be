@@ -31,14 +31,12 @@ services:
                 condition: service_healthy
         ports:
             - "8000:8000"
-        volumes:
-            - /models:/app/models
         networks:
             - mytruyen-net
         command: >
             bash -c "
             alembic upgrade head &&
-            uvicorn app.main:app --host 0.0.0.0 --port 8000
+            fastapi run app/main.py --workers 4
             "
     
     mytruyen-redis:
@@ -56,9 +54,23 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+    
+    meilisearch:
+        image: getmeili/meilisearch:latest
+        container_name: meilisearch
+        restart: always
+        environment:
+        - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+        - MEILI_ENV=production
+        - MEILI_NO_ANALYTICS=true
+        ports:
+        - "7700:7700"
+        volumes:
+        - meili_data:/meili_data
 
 volumes:
     db-data:
+    meili_data:
 
 networks:
     mytruyen-net:
