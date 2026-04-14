@@ -30,12 +30,3 @@ async def init_db(session: AsyncSession):
         await crud_user.create_user(session, admin_in)
         print(f"Created initial admin user with email: {settings.FIRST_ADMIN_EMAIL}")
 
-import redis
-
-r = redis.Redis(
-    host='redis-12984.c295.ap-southeast-1-1.ec2.cloud.redislabs.com',
-    port=12984,
-    decode_responses=True,
-    username="default",
-    password="9nkCo4EywtBxMpqAdnSUn4pMHoY3FvtN",
-)

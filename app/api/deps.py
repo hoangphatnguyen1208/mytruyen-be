@@ -1,10 +1,12 @@
+import aio_pika
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
-from typing import Annotated, TypeAlias
+from typing import Annotated, Any, TypeAlias
 from sqlmodel.ext.asyncio.session import AsyncSession
 import uuid
 from httpx import AsyncClient
+from meilisearch import Client as MeiliSearchClient
 
 from app.utilities.exceptions.http.exc_403 import http_exc_403_forbidden_request
 from app.utilities.exceptions.http.exc_404 import http_exc_404_id_not_found_request
@@ -54,21 +56,24 @@ def get_current_admin(current_user: CurrentUser) -> User:
 
 CurrentAdmin: TypeAlias = Annotated[User, Depends(get_current_admin)]
 
-from arq.connections import RedisSettings
-from arq import create_pool
 
-async def get_redis():
-    async with await create_pool(RedisSettings(
-        host=settings.REDIS_HOST,
-        port=settings.REDIS_PORT,
-        password=settings.REDIS_PASSWORD
-    )) as redis:
-        yield redis
+async def get_redis(request: Request):
+    return request.app.state.redis_pool
 
-RedisDep: TypeAlias = Annotated[any, Depends(get_redis)]
+RedisDep: TypeAlias = Annotated[Any, Depends(get_redis)]
 
 async def get_client():
     async with AsyncClient() as client:
         yield client
 
 ClientDep: TypeAlias = Annotated[AsyncClient, Depends(get_client)]
+
+async def get_meilisearch_client(request: Request):
+    return request.app.state.meili_client
+
+MeiliSearchClientDep: TypeAlias = Annotated[MeiliSearchClient, Depends(get_meilisearch_client)]
+
+async def get_rabbitmq_channel(request: Request):
+    return request.app.state.rabbitmq_channel
+
+RabbitMQChannelDep: TypeAlias = Annotated[aio_pika.Channel, Depends(get_rabbitmq_channel)]

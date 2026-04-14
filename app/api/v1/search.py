@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Request, UploadFile, File, HTTPException, status
 from pydantic import BaseModel
-from app.schema.response import Response, ResponseList
+from app.api.deps import SessionDep, MeiliSearchClientDep
+from app.schema.response import Response, ResponseList, ResponsePage
+from app.service import search as service_search
 # from app.utilities.audio_transcription import AudioTranscriber
 # from app.utilities.youtube_downloader import YouTubeAudioDownloader
 
@@ -11,21 +13,33 @@ class YouTubeSearchRequest(BaseModel):
     url: str
     language: str = "vi"
 
-@router.get("", response_model=ResponseList[dict])
-async def search_stories(request: Request, query_text: str):
+@router.get("/meili")
+async def search_stories_meili(session: SessionDep, meili_client: MeiliSearchClientDep, query: str, limit: int = 10, page: int = 1):
+    books, pagination = await service_search.meilisearch_query(session, meili_client, query, limit, page)
+    return ResponsePage(
+        status_code=200,
+        success=True,
+        message="Search completed successfully",
+        data=books,
+        pagination=pagination
+    )
+
+
+@router.get("/hybrid", response_model=ResponseList[dict])
+async def search_stories(session: SessionDep, request: Request, search: str):
     raise HTTPException(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         detail="Tính năng này tạm thời bị vô hiệu hóa."
     )
 
 
-    print("Search query received:", query_text)
+    print("Search query received:", search)
     model = request.app.state.model
     index = request.app.state.pc_index
     pc = request.app.state.pc
     print("Model and index accessed from app state.")
     query_output = model.encode(
-        query_text,
+        search,
         return_dense=True,
         return_sparse=True,
     )
@@ -63,7 +77,7 @@ async def search_stories(request: Request, query_text: str):
 
     rerank_results = pc.inference.rerank(
         model="bge-reranker-v2-m3", 
-        query=query_text,
+        query=search,
         documents=documents,
         top_n=10,
         return_documents=True,
@@ -188,7 +202,7 @@ async def search_stories_by_audio(
         
         rerank_results = pc.inference.rerank(
             model="bge-reranker-v2-m3", 
-            query=query_text,
+            query=search,
             documents=documents,
             top_n=10,
             return_documents=True,

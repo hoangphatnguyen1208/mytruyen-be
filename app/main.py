@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, logger
 from app.api.main import api_router
 from app.core.config import settings
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -9,30 +9,57 @@ from starlette.middleware.cors import CORSMiddleware
 # from FlagEmbedding import BGEM3FlagModel
 # from pinecone import Pinecone
 # from faster_whisper import WhisperModel
-# from contextlib import asynccontextmanager
-# import logging
+from contextlib import asynccontextmanager
+import logging
+from meilisearch import Client as MeiliSearchClient
+import aio_pika
 
 # device = torch.device("cpu")
-# logger = logging.getLogger("uvicorn")
+logger = logging.getLogger("main")
+from arq.connections import RedisSettings
+from arq import create_pool
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     logger.info("⏳ Loading models & Pinecone...")
-#     app.state.model = BGEM3FlagModel('BAAI/bge-m3', device='cpu')
-#     app.state.whisper_model = WhisperModel('turbo', device='cpu', compute_type='int8')
-#     app.state.pc = Pinecone(api_key=settings.PINECONE_API_KEY)
-#     app.state.pc_index = app.state.pc.Index("hybrid-spilt")
-#     logger.info("✅ Models & Pinecone loaded successfully.")
-#     yield
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # logger.info("⏳ Loading models & Pinecone...")
+    # app.state.model = BGEM3FlagModel('BAAI/bge-m3', device='cpu')
+    # app.state.whisper_model = WhisperModel('turbo', device='cpu', compute_type='int8')
+    # app.state.pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+    # app.state.pc_index = app.state.pc.Index("hybrid-spilt")
+    # logger.info("✅ Models & Pinecone loaded successfully.")
+    app.state.redis_pool = await create_pool(RedisSettings(
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
+        password=settings.REDIS_PASSWORD
+    ))
+    logger.info("Redis pool for arq created successfully.")
 
-#     del app.state.model
-#     del app.state.whisper_model
-#     del app.state.pc
-#     del app.state.pc_index
+    app.state.meili_client = MeiliSearchClient(settings.MEILI_URL, settings.MEILI_MASTER_KEY)
+    logger.info("MeiliSearch client created successfully.")
+
+    app.state.rabbitmq_connection = await aio_pika.connect_robust(settings.RABBITMQ_URL)
+    app.state.rabbitmq_channel = await app.state.rabbitmq_connection.channel()
+    await app.state.rabbitmq_channel.declare_queue(settings.RABBITMQ_QUEUE_NAME, durable=True)
+    logger.info("RabbitMQ connection created successfully.")
+    
+    yield
+
+    # del app.state.model
+    # del app.state.whisper_model
+    # del app.state.pc
+    # del app.state.pc_index
+    await app.state.redis_pool.close()
+    del app.state.redis_pool
+    del app.state.meili_client
+
+    await app.state.rabbitmq_channel.close()
+    await app.state.rabbitmq_connection.close()
+    del app.state.rabbitmq_channel
+    del app.state.rabbitmq_connection
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    # lifespan=lifespan
+    lifespan=lifespan
 )
 
 app.add_middleware(

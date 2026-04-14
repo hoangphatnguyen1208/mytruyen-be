@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status
-from app.api.deps import SessionDep, CurrentAdmin, ClientDep
+from app.api.deps import SessionDep, CurrentAdmin, ClientDep, RabbitMQChannelDep
 
 from app.crud import book as crud_book
 from app.service import book as service_book
@@ -10,8 +10,8 @@ from app.schema.response import Response, ResponseList, ResponsePage
 router = APIRouter(prefix="/books", tags=["book"])
 
 @router.post("", response_model=Response[BookPublic], status_code=status.HTTP_201_CREATED)
-async def create_book(session: SessionDep, current_admin: CurrentAdmin, book_register: BookRegister):
-    db_book = await service_book.create_book(session, str(current_admin.id), book_register)
+async def create_book(session: SessionDep, rabbitmq_channel: RabbitMQChannelDep, current_admin: CurrentAdmin, book_register: BookRegister):
+    db_book = await service_book.create_book(session, rabbitmq_channel, str(current_admin.id), book_register)
     return Response(status_code=201, success=True, message="Book created successfully", data=db_book)
 
 @router.get("", response_model=ResponsePage[BookPublic])
@@ -36,13 +36,13 @@ async def get_book_by_id(book_id: int, session: SessionDep):
     return Response(status_code=200, success=True, message="Book retrieved successfully", data=db_book)
 
 @router.patch("/id/{book_id}", response_model=Response[BookPublic])
-async def update_book(book_id: int, session: SessionDep, current_admin: CurrentAdmin, book: BookUpdate):
-    updated_book = await service_book.update_book_by_id(session, book_id, book)
+async def update_book( book_id: int, session: SessionDep, current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep, book: BookUpdate):
+    updated_book = await service_book.update_book_by_id(session, rabbitmq_channel, book_id, book)
     return Response(status_code=200, success=True, message="Book updated successfully", data=updated_book)
 
 @router.delete("/id/{book_id}", response_model=Response[None])
-async def delete_book(book_id: int, session: SessionDep, current_admin: CurrentAdmin):
-    await service_book.delete_book_by_id(session, book_id)
+async def delete_book(book_id: int, session: SessionDep, current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep):
+    await service_book.delete_book_by_id(session, rabbitmq_channel, book_id)
     return Response(status_code=200, success=True, message="Book deleted successfully", data=None)
 
 @router.get("/slug/{slug}", response_model=Response[BookPublic])
@@ -51,13 +51,13 @@ async def get_book_by_slug(slug: str, session: SessionDep):
     return Response(status_code=200, success=True, message="Book retrieved successfully", data=db_book)
 
 @router.patch("/slug/{slug}", response_model=Response[BookPublic])
-async def update_book(slug: str, session: SessionDep, current_admin: CurrentAdmin, book: BookUpdate):
-    updated_book = await service_book.update_book_by_slug(session, slug, book)
+async def update_book(slug: str, session: SessionDep, current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep, book: BookUpdate):
+    updated_book = await service_book.update_book_by_slug(session, rabbitmq_channel, slug, book)
     return Response(status_code=200, success=True, message="Book updated successfully", data=updated_book)
 
 @router.delete("/slug/{slug}", response_model=Response[None])
-async def delete_book(slug: str, session: SessionDep, current_admin: CurrentAdmin):
-    await service_book.delete_book_by_slug(session, slug)
+async def delete_book(slug: str, session: SessionDep, current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep):
+    await service_book.delete_book_by_slug(session, rabbitmq_channel, slug)
     return Response(status_code=200, success=True, message="Book deleted successfully", data=None)
 
 @router.get("/topboxes")

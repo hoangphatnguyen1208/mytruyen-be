@@ -1,3 +1,6 @@
+import aio_pika
+
+from app.core.config import settings
 from app.crud import (
     author as crud_author,
     book as crud_book,
@@ -7,6 +10,7 @@ from app.crud import (
 )
 from app.models import Book
 from app.schema.book import BookCreate, BookRegister, BookUpdate
+from app.schema.search import Data, Message
 from app.schema.response import Pagination
 from app.utilities.exceptions.http.exc_400 import http_exc_400_bad_book_request
 from app.utilities.exceptions.http.exc_404 import (
@@ -28,7 +32,7 @@ async def get_books(session, skip: int, limit: int, sort: str | None = None) -> 
     )
     return books, pagination
 
-async def create_book(session, creator_id: str, book_register: BookRegister) -> Book:
+async def create_book(session, rabbitmq_channel: aio_pika.Channel, creator_id: str, book_register: BookRegister) -> Book:
     existing_book = await crud_book.get_book_by_slug(session, book_register.slug)
     if existing_book:
         raise http_exc_400_bad_book_request(slug=book_register.slug)
@@ -52,7 +56,13 @@ async def create_book(session, creator_id: str, book_register: BookRegister) -> 
             raise http_exc_404_genre_not_found(genre_id=genre_id)
 
     book_in = BookCreate.model_validate(book_register, update={"creator_id": creator_id})
-    return await crud_book.create_book(session, book_in)
+    db_book = await crud_book.create_book(session, book_in)
+
+    # Publish message to RabbitMQ for asynchronous processing (e.g., updating Meilisearch index)
+    await rabbitmq_channel.default_exchange.publish(
+        aio_pika.Message(body=Message(type="post", data=Data(id=db_book.id, name=db_book.name, author=db_book.author.name)).json().encode()),
+        routing_key=settings.RABBITMQ_QUEUE_NAME,
+    )
 
 
 async def get_book_by_id(session, book_id: int) -> Book:
@@ -69,29 +79,52 @@ async def get_book_by_slug(session, slug: str) -> Book:
     return db_book
 
 
-async def update_book_by_id(session, book_id: int, book: BookUpdate) -> Book:
+async def update_book_by_id(session, rabbitmq_channel: aio_pika.Channel, book_id: int, book: BookUpdate) -> Book:
     db_book = await get_book_by_id(session, book_id)
     if not db_book:
         raise http_exc_404_book_not_found_request(string=book_id)
-    return await crud_book.update_book(session, db_book.id, book)
+    new_book = await crud_book.update_book(session, db_book.id, book)
+
+    await rabbitmq_channel.default_exchange.publish(
+        aio_pika.Message(body=Message(type="patch", data=Data(id=new_book.id, name=new_book.name, author=new_book.author.name)).json().encode()),
+        routing_key=settings.RABBITMQ_QUEUE_NAME,
+    )
+    return new_book
 
 
-async def update_book_by_slug(session, slug: str, book: BookUpdate) -> Book:
+async def update_book_by_slug(session, rabbitmq_channel: aio_pika.Channel, slug: str, book: BookUpdate) -> Book:
     db_book = await get_book_by_slug(session, slug)
     if not db_book:
         raise http_exc_404_book_not_found_request(string=slug)
-    return await crud_book.update_book(session, db_book.id, book)
+    new_book = await crud_book.update_book(session, db_book.id, book)
+
+    await rabbitmq_channel.default_exchange.publish(
+        aio_pika.Message(body=Message(type="patch", data=Data(id=new_book.id, name=new_book.name, author=new_book.author.name)).json().encode()),
+        routing_key=settings.RABBITMQ_QUEUE_NAME,
+    )
+    return new_book
 
 
-async def delete_book_by_id(session, book_id: int) -> None:
+async def delete_book_by_id(session, rabbitmq_channel: aio_pika.Channel, book_id: int) -> None:
     db_book = await get_book_by_id(session, book_id)
     if not db_book:
         raise http_exc_404_book_not_found_request(string=book_id)
     await crud_book.delete_book(session, db_book.id)
 
+    await rabbitmq_channel.default_exchange.publish(
+        aio_pika.Message(body=Message(type="delete", data=Data(id=db_book.id, name=db_book.name, author=db_book.author.name)).json().encode()),
+        routing_key=settings.RABBITMQ_QUEUE_NAME,
+    )
 
-async def delete_book_by_slug(session, slug: str) -> None:
+
+async def delete_book_by_slug(session, rabbitmq_channel: aio_pika.Channel, slug: str) -> None:
     db_book = await get_book_by_slug(session, slug)
     if not db_book:
         raise http_exc_404_book_not_found_request(string=slug)
     await crud_book.delete_book(session, db_book.id)
+
+    await rabbitmq_channel.default_exchange.publish(
+        aio_pika.Message(body=Message(type="delete", data=Data(id=db_book.id, name=db_book.name, author=db_book.author.name)).json().encode()),
+        routing_key=settings.RABBITMQ_QUEUE_NAME,
+    )
+

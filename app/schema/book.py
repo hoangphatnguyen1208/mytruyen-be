@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, Field
 from pydantic import ConfigDict
+from app.schema.tag import TagPublic
 from app.schema.user import UserPublic
 from app.schema.genre import GenrePublic
 from app.schema.author import AuthorPublic
@@ -32,6 +33,7 @@ class BookCreate(BookBase):
     author_id: uuid.UUID | None = None
     creator_id: uuid.UUID
     genre_ids: list[int]
+    tag_ids: list[int]
 
 class BookPublic(BookBase):
     id: int
@@ -51,6 +53,7 @@ class BookPublic(BookBase):
     author: AuthorPublic | None
     creator: UserPublic
     genres: list[GenrePublic] 
+    tags: list[TagPublic] 
 
 class BookUpdate(SQLModel):
     name: str | None = None

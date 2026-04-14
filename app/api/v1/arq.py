@@ -23,3 +23,8 @@ async def crawl_book_statuses(current_admin: CurrentAdmin, redis: RedisDep) -> R
 async def crawl_books(current_admin: CurrentAdmin, redis: RedisDep, limit: int = 20) -> Response[None]:
     await redis.enqueue_job("crawl_all_books", limit=limit)
     return Response(status_code=200, success=True, message="Crawl books job enqueued", data=None)
+
+@router.post("/add-all-books-to-mq", response_model=Response[None])
+async def add_all_books_to_mq(current_admin: CurrentAdmin, redis: RedisDep) -> Response[None]:
+    await redis.enqueue_job("add_all_books_to_rabbitmq")
+    return Response(status_code=200, success=True, message="Add all books to MQ job enqueued", data=None)

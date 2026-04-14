@@ -31,5 +31,11 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str
 
     PINECONE_API_KEY: str
+    
+    MEILI_URL: str
+    MEILI_MASTER_KEY: str
+
+    RABBITMQ_URL: str
+    RABBITMQ_QUEUE_NAME: str
 
 settings = Settings()

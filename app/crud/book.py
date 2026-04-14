@@ -2,7 +2,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import func, select
 from sqlalchemy.orm import selectinload
 
-from app.models import Book, Genre
+from app.models import Book, Genre, Tag
 from app.schema.book import BookCreate, BookUpdate
 
 async def create_book(session: AsyncSession, book_create: BookCreate) -> Book:
@@ -13,6 +13,11 @@ async def create_book(session: AsyncSession, book_create: BookCreate) -> Book:
     if book_create.genre_ids:
         genres = await session.exec(select(Genre).where(Genre.id.in_(book_create.genre_ids)))
         db_book.genres = genres.all()
+        session.add(db_book)
+    
+    if book_create.tag_ids:
+        tags = await session.exec(select(Tag).where(Tag.id.in_(book_create.tag_ids)))
+        db_book.tags = tags.all()
         session.add(db_book)
     await session.commit()
     await session.refresh(db_book)
@@ -62,6 +67,9 @@ async def update_book(session: AsyncSession, book_id: int, book: BookUpdate) -> 
     if 'genre_ids' in book_data:
         genres = await session.exec(select(Genre).where(Genre.id.in_(book_data['genre_ids'])))
         current_book.genres = genres.all()
+    if 'tag_ids' in book_data:
+        tags = await session.exec(select(Tag).where(Tag.id.in_(book_data['tag_ids'])))
+        current_book.tags = tags.all()
     session.add(current_book)
     await session.commit()
     await session.refresh(current_book)
