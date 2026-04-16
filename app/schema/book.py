@@ -4,6 +4,7 @@ from app.schema.tag import TagPublic
 from app.schema.user import UserPublic
 from app.schema.genre import GenrePublic
 from app.schema.author import AuthorPublic
+from app.schema.book_status import BookStatusPublic
 
 from datetime import datetime
 import uuid
@@ -52,8 +53,9 @@ class BookPublic(BookBase):
     
     author: AuthorPublic | None
     creator: UserPublic
+    status: BookStatusPublic
     genres: list[GenrePublic] 
-    tags: list[TagPublic] 
+    tags: list[TagPublic]
 
 class BookUpdate(SQLModel):
     name: str | None = None
