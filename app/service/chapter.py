@@ -68,6 +68,15 @@ async def get_chapter_by_book_id_and_index(session: AsyncSession, book_id: int, 
         raise http_exc_404_chapter_not_found_request(string=f"{chapter_index}")
     return chapter
 
+async def get_chapter_by_book_slug_and_index(session: AsyncSession, book_slug: str, chapter_index: int) -> Chapter:
+    existing_book = await crud_book.get_book_by_slug(session, book_slug)
+    if not existing_book:
+        raise http_exc_404_book_not_found_request(string=f"{book_slug}")
+    chapter = await crud_chapter.get_chapter_by_book_id_and_index(session, existing_book.id, chapter_index)
+    if not chapter:
+        raise http_exc_404_chapter_not_found_request(string=f"{chapter_index}")
+    return chapter
+
 async def create_chapter(session: AsyncSession, chapter_in: ChapterCreate) -> None:
     existing_book = await crud_book.get_book_by_id(session, chapter_in.book_id)
     if not existing_book:
@@ -87,18 +96,23 @@ async def create_chapter_by_slug(session: AsyncSession, book_slug: str, creator_
     chapter_in = ChapterCreate.model_validate(chapter_data, update={"book_id": existing_book.id, "creator_id": creator_id})
     await crud_chapter.create_chapter(session, chapter_in)
 
-async def delete_chapter(session: AsyncSession, chapter_id: int) -> None:
-    existing_chapter = await crud_chapter.get_chapter_by_id(session, chapter_id)
-    if not existing_chapter:
-        raise http_exc_404_chapter_not_found_request(string=f"{chapter_id}")
-    await crud_chapter.delete_chapter(session, chapter_id)
-
 async def update_chapter(session: AsyncSession, chapter_id: int, chapter_in: ChapterUpdate) -> Chapter:
     existing_chapter = await crud_chapter.get_chapter_by_id(session, chapter_id)
     if not existing_chapter:
         raise http_exc_404_chapter_not_found_request(string=f"{chapter_id}")
     updated_chapter = await crud_chapter.update_chapter(session, chapter_id, chapter_in)
     return updated_chapter
+
+async def delete_chapter(session: AsyncSession, chapter_id: int) -> None:
+    existing_chapter = await crud_chapter.get_chapter_by_id(session, chapter_id)
+    if not existing_chapter:
+        raise http_exc_404_chapter_not_found_request(string=f"{chapter_id}")
+    await crud_chapter.delete_chapter(session, chapter_id)
+
+
+
+
+
 
 async def get_chapter_content_by_book_id_and_index(session: AsyncSession, book_id: int, chapter_index: int) -> ChapterContent:
     existing_book = await crud_book.get_book_by_id(session, book_id)

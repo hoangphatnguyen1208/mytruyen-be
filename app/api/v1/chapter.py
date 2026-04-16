@@ -31,7 +31,7 @@ async def get_chapter(
         pagination=pagination
     )
 
-@router.get("/id/{book_id}/index/{index}", response_model=Response[ChapterPublic])
+@router.get("/id/{book_id}/{index}", response_model=Response[ChapterPublic])
 async def get_chapter_by_book_id_and_index(session: SessionDep, book_id: int, index: int): 
     chapter = await service_chapter.get_chapter_by_book_id_and_index(session, book_id, index)
     return Response(status_code=200, success=True, message="Chapter retrieved successfully", data=chapter)
@@ -77,6 +77,11 @@ async def get_chapter_by_slug(session: SessionDep, book_slug: str, limit: int = 
         data=chapters,
         pagination=pagination
     )
+
+@router.get("/slug/{book_slug}/{index}", response_model=Response[ChapterPublic])
+async def get_chapter_by_book_slug_and_index(session: SessionDep, book_slug: str, index: int):
+    chapter = await service_chapter.get_chapter_by_book_slug_and_index(session, book_slug, index)
+    return Response(status_code=200, success=True, message="Chapter retrieved successfully", data=chapter)
 
 @router.delete("/slug/{chapter_id}", response_model=Response[None])
 async def delete_chapter_by_slug(session: SessionDep, chapter_id: int, current_admin: CurrentAdmin) -> Response[None]:
