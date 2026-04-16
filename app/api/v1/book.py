@@ -19,6 +19,7 @@ async def get_books(
     session: SessionDep,
     page: int = 1,
     limit: int = 10,
+    status: int | None = None,
     sort: str | None = None,
 ):
     skip = (page - 1) * limit
@@ -26,6 +27,7 @@ async def get_books(
         session=session,
         skip=skip,
         limit=limit,
+        status=status,
         sort=sort,
     )
     return ResponsePage(status_code=200, success=True, message="Books retrieved successfully", data=db_books, pagination=pagination)

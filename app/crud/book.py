@@ -23,8 +23,10 @@ async def create_book(session: AsyncSession, book_create: BookCreate) -> Book:
     await session.refresh(db_book)
     return db_book
 
-async def get_book_count(session: AsyncSession) -> int:
+async def get_book_count(session: AsyncSession, status: int | None = None) -> int:
     statement = select(func.count()).select_from(Book)
+    if status is not None:
+        statement = statement.where(Book.status == status)
     result = await session.exec(statement)
     return result.first()
 
@@ -33,8 +35,12 @@ async def get_books(
     skip: int = 0,
     limit: int = 10,
     sort: str | None = None,
+    status: int | None = None,
 ) -> list[Book]:
     statement = select(Book)
+    
+    if status is not None:
+        statement = statement.where(Book.status == status)
     
     # Apply sorting
     if sort:

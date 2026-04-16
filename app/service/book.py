@@ -21,9 +21,9 @@ from app.utilities.exceptions.http.exc_404 import (
     http_exc_404_tag_not_found_request,
 )
 
-async def get_books(session, skip: int, limit: int, sort: str | None = None) -> tuple[list[Book], Pagination]:
-    books = await crud_book.get_books(session, skip, limit, sort)
-    total = await crud_book.get_book_count(session)
+async def get_books(session, skip: int, limit: int, sort: str | None = None, status: int | None = None) -> tuple[list[Book], Pagination]:
+    books = await crud_book.get_books(session, skip, limit, sort, status)
+    total = await crud_book.get_book_count(session, status)
     pagination = Pagination(
         page=(skip // limit) + 1, 
         size=limit, 
