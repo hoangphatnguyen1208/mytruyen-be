@@ -1,8 +1,10 @@
-class Data:
+from sqlmodel import SQLModel
+
+class Data(SQLModel):
     id: int
     name: str
     author: str
 
-class Message:
+class Message(SQLModel):
     type: str
     data: Data

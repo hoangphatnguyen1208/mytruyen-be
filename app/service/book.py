@@ -63,6 +63,7 @@ async def create_book(session, rabbitmq_channel: aio_pika.Channel, creator_id: s
         aio_pika.Message(body=Message(type="post", data=Data(id=db_book.id, name=db_book.name, author=db_book.author.name)).json().encode()),
         routing_key=settings.RABBITMQ_QUEUE_NAME,
     )
+    return db_book
 
 
 async def get_book_by_id(session, book_id: int) -> Book:
