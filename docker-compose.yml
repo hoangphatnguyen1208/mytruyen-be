@@ -66,17 +66,6 @@ services:
         - "7700:7700"
         volumes:
         - meili_data:/meili_data
-    
-    
-    rabbitmq:
-        image: rabbitmq:3-management-alpine
-        container_name: rabbitmq_server
-        ports:
-        - "5672:5672"
-        - "15672:15672"
-        environment:
-        - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
-        - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
 
 volumes:
     db-data:

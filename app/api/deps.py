@@ -1,4 +1,3 @@
-import aio_pika
 import jwt
 from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
@@ -72,8 +71,3 @@ async def get_meilisearch_client(request: Request):
     return request.app.state.meili_client
 
 MeiliSearchClientDep: TypeAlias = Annotated[MeiliSearchClient, Depends(get_meilisearch_client)]
-
-async def get_rabbitmq_channel(request: Request):
-    return request.app.state.rabbitmq_channel
-
-RabbitMQChannelDep: TypeAlias = Annotated[aio_pika.Channel, Depends(get_rabbitmq_channel)]

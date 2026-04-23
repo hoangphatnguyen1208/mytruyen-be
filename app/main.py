@@ -12,7 +12,6 @@ from starlette.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 from meilisearch import Client as MeiliSearchClient
-import aio_pika
 
 # device = torch.device("cpu")
 logger = logging.getLogger("main")
@@ -37,10 +36,8 @@ async def lifespan(app: FastAPI):
     app.state.meili_client = MeiliSearchClient(settings.MEILI_URL, settings.MEILI_MASTER_KEY)
     logger.info("MeiliSearch client created successfully.")
 
-    app.state.rabbitmq_connection = await aio_pika.connect_robust(settings.RABBITMQ_URL)
-    app.state.rabbitmq_channel = await app.state.rabbitmq_connection.channel()
-    await app.state.rabbitmq_channel.declare_queue(settings.RABBITMQ_QUEUE_NAME, durable=True)
-    logger.info("RabbitMQ connection created successfully.")
+    # await app.state.rabbitmq_channel.declare_queue(settings.RABBITMQ_QUEUE_NAME, durable=True)
+    # logger.info("RabbitMQ connection created successfully.")
     
     yield
 
@@ -51,11 +48,6 @@ async def lifespan(app: FastAPI):
     await app.state.redis_pool.close()
     del app.state.redis_pool
     del app.state.meili_client
-
-    await app.state.rabbitmq_channel.close()
-    await app.state.rabbitmq_connection.close()
-    del app.state.rabbitmq_channel
-    del app.state.rabbitmq_connection
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

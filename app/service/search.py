@@ -1,4 +1,3 @@
-import aio_pika
 from meilisearch import Client as MeiliSearchClient
 from app.models import Book
 from app.schema.search import Data
