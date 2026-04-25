@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_URL: str
     POSTGRES_SYNC_URL: str
+    POOL_SIZE: int
+    MAX_OVERFLOW: int
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int 
     REFRESH_TOKEN_EXPIRE_DAYS: int

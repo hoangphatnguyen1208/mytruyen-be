@@ -8,7 +8,9 @@ from app.schema.user import UserCreate
 from app.core.config import settings
 
 async_engine = create_async_engine(
-    settings.POSTGRES_URL
+    settings.POSTGRES_URL,
+    pool_size=settings.POOL_SIZE,
+    max_overflow=settings.MAX_OVERFLOW,
 )
 
 async_session_factory = async_sessionmaker(
