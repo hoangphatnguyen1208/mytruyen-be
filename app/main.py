@@ -5,13 +5,10 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.schema.response import Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
-# import torch
-# from FlagEmbedding import BGEM3FlagModel
-# from pinecone import Pinecone
-# from faster_whisper import WhisperModel
 from contextlib import asynccontextmanager
 import logging
 from meilisearch import Client as MeiliSearchClient
+from aio_pika import connect_robust, Message, DeliveryMode
 
 # device = torch.device("cpu")
 logger = logging.getLogger("main")
@@ -20,12 +17,6 @@ from arq import create_pool
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # logger.info("⏳ Loading models & Pinecone...")
-    # app.state.model = BGEM3FlagModel('BAAI/bge-m3', device='cpu')
-    # app.state.whisper_model = WhisperModel('turbo', device='cpu', compute_type='int8')
-    # app.state.pc = Pinecone(api_key=settings.PINECONE_API_KEY)
-    # app.state.pc_index = app.state.pc.Index("hybrid-spilt")
-    # logger.info("✅ Models & Pinecone loaded successfully.")
     app.state.redis_pool = await create_pool(RedisSettings(
         host=settings.REDIS_HOST,
         port=settings.REDIS_PORT,
@@ -36,18 +27,18 @@ async def lifespan(app: FastAPI):
     app.state.meili_client = MeiliSearchClient(settings.MEILI_URL, settings.MEILI_MASTER_KEY)
     logger.info("MeiliSearch client created successfully.")
 
-    # await app.state.rabbitmq_channel.declare_queue(settings.RABBITMQ_QUEUE_NAME, durable=True)
-    # logger.info("RabbitMQ connection created successfully.")
+    app.state.rabbitmq_connection = await connect_robust(url=settings.RABBITMQ_URL)
+    app.state.rabbitmq_channel = await app.state.rabbitmq_connection.channel()
+    await app.state.rabbitmq_channel.declare_queue(settings.RABBITMQ_QUEUE_CRAWL, durable=True)
+    logger.info("RabbitMQ channel created successfully.")
     
     yield
 
-    # del app.state.model
-    # del app.state.whisper_model
-    # del app.state.pc
-    # del app.state.pc_index
     await app.state.redis_pool.close()
     del app.state.redis_pool
     del app.state.meili_client
+    await app.state.rabbitmq_channel.close()
+    del app.state.rabbitmq_channel
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

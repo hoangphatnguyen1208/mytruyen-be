@@ -71,3 +71,8 @@ async def get_meilisearch_client(request: Request):
     return request.app.state.meili_client
 
 MeiliSearchClientDep: TypeAlias = Annotated[MeiliSearchClient, Depends(get_meilisearch_client)]
+
+async def get_rabbitmq_channel(request: Request):
+    return request.app.state.rabbitmq_channel
+
+RabbitMQChannelDep: TypeAlias = Annotated[Any, Depends(get_rabbitmq_channel)]

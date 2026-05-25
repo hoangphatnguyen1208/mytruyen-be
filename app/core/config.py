@@ -37,4 +37,8 @@ class Settings(BaseSettings):
     MEILI_URL: str
     MEILI_MASTER_KEY: str
 
+    RABBITMQ_URL: str
+    RABBITMQ_QUEUE_CRAWL: str
+
+
 settings = Settings()
