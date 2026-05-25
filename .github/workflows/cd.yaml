@@ -20,6 +20,7 @@ jobs:
           script: |
             cd mytruyen-be
             docker pull hoangphat120805/mytruyen-be:latest
+            docker compose down mytruyen-be
             docker compose up -d mytruyen-be
             docker image prune -f
       - name: Notify Telegram
