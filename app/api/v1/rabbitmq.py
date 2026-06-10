@@ -61,29 +61,29 @@ async def send_all_books_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_chann
     return Response(status_code=200, success=True, message="Crawl all books message sent to RabbitMQ", data=None)
 
 @router.post("/book", response_model=Response[None])
-async def send_book_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep, book_id: RabbitMQB) -> Response[None]:
+async def send_book_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep, book: RabbitMQB) -> Response[None]:
     await rabbitmq_channel.default_exchange.publish(
         Message(
             body=json.dumps({
                 "type": "crawl_book",
-                "book_id": book_id
+                "book_id": book.book_id
             }).encode(),
             delivery_mode=DeliveryMode.PERSISTENT
         ),
         routing_key=settings.RABBITMQ_QUEUE_CRAWL
     )
-    return Response(status_code=200, success=True, message=f"Crawl book {book_id} message sent to RabbitMQ", data=None)
+    return Response(status_code=200, success=True, message=f"Crawl book {book.book_id} message sent to RabbitMQ", data=None)
 
 @router.post("/chapters", response_model=Response[None])
-async def send_chapters_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep, book_id: RabbitMQB) -> Response[None]:
+async def send_chapters_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep, book: RabbitMQB) -> Response[None]:
     await rabbitmq_channel.default_exchange.publish(
         Message(
             body=json.dumps({
                 "type": "crawl_chapters",
-                "book_id": book_id
+                "book_id": book.book_id
             }).encode(),
             delivery_mode=DeliveryMode.PERSISTENT
         ),
         routing_key=settings.RABBITMQ_QUEUE_CRAWL
     )
-    return Response(status_code=200, success=True, message=f"Crawl chapters for book {book_id} message sent to RabbitMQ", data=None)
+    return Response(status_code=200, success=True, message=f"Crawl chapters for book {book.book_id} message sent to RabbitMQ", data=None)
