@@ -60,7 +60,7 @@ async def send_all_books_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_chann
     return Response(status_code=200, success=True, message="Crawl all books message sent to RabbitMQ", data=None)
 
 @router.post("/book", response_model=Response[None])
-async def send_book_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep, book_id: str = Body(...)) -> Response[None]:
+async def send_book_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep, book_id: int = Body(...)) -> Response[None]:
     await rabbitmq_channel.default_exchange.publish(
         Message(
             body=json.dumps({
@@ -74,7 +74,7 @@ async def send_book_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_channel: R
     return Response(status_code=200, success=True, message=f"Crawl book {book_id} message sent to RabbitMQ", data=None)
 
 @router.post("/chapters", response_model=Response[None])
-async def send_chapters_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep, book_id: str = Body(...)) -> Response[None]:
+async def send_chapters_to_rabbitmq(current_admin: CurrentAdmin, rabbitmq_channel: RabbitMQChannelDep, book_id: int = Body(...)) -> Response[None]:
     await rabbitmq_channel.default_exchange.publish(
         Message(
             body=json.dumps({
