@@ -60,6 +60,10 @@ async def get_book_by_id(session: AsyncSession, book_id: int) -> Book | None:
     book = await session.exec(select(Book).where(Book.id == book_id))
     return book.first()
 
+async def get_book_by_ids(session: AsyncSession, book_ids: list[int]) -> list[Book]:
+    books = await session.exec(select(Book).where(Book.id.in_(book_ids)))
+    return books.all()
+
 async def get_book_by_slug(session: AsyncSession, slug: str) -> Book | None:
     statement = select(Book).where(Book.slug == slug)
     books = await session.exec(statement)

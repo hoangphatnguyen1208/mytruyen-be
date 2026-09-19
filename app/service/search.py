@@ -10,10 +10,27 @@ async def meilisearch_query(session: AsyncSession, meili_client: MeiliSearchClie
     index = meili_client.index("books")
     search_result = index.search(query, {"limit": limit, "offset": (page - 1) * limit})
     results = search_result.get("hits", [])
-    books = []
-    for book in results:
-        db_book = await crud_book.get_book_by_id(session, book["id"])
-        books.append(db_book)
+    
+    book_ids = [hit["id"] for hit in results]
+    if book_ids:
+        found_books = await crud_book.get_book_by_ids(
+            session,
+            book_ids,
+        )
+
+        books_by_id = {
+            book.id: book
+            for book in found_books
+        }
+
+        books = [
+            books_by_id[book_id]
+            for book_id in book_ids
+            if book_id in books_by_id
+        ]
+    else:
+        books = []
+        
     pagination = Pagination(
         page=page,
         size=limit,
