@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from app.api.deps import SessionDep, MeiliSearchClientDep
 from app.schema.response import Response, ResponseList, ResponsePage
 from app.service import search as service_search
+from app.schema.book import BookPublic
 # from app.utilities.audio_transcription import AudioTranscriber
 # from app.utilities.youtube_downloader import YouTubeAudioDownloader
 
@@ -13,7 +14,7 @@ class YouTubeSearchRequest(BaseModel):
     url: str
     language: str = "vi"
 
-@router.get("/meili")
+@router.get("/meili", response_model=ResponsePage[BookPublic])
 async def search_stories_meili(session: SessionDep, meili_client: MeiliSearchClientDep, query: str, limit: int = 10, page: int = 1):
     books, pagination = await service_search.meilisearch_query(session, meili_client, query, limit, page)
     return ResponsePage(
